@@ -1,6 +1,6 @@
 # UrbanSurfAce
 
-## Interactive Map Code Overview
+## Code Overview
 
 The following code creates an interactive map that allows users to draw rectangles on the map and then download and display OpenStreetMap (OSM) building data within the area defined by the drawn rectangles. The code operates in the following manner:
 

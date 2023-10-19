@@ -24,4 +24,4 @@ The result is an interactive map where users can draw rectangles, download OSM b
 
 The `CustomControl` and `CustomControl2` classes handle the user interactions with the map, allowing users to trigger specific actions like downloading and displaying building data.
 
-![Alt Text](https://github.com/jacobogabeiraspenas/UrbanSurfAce/blob/main/UrbanSurfAce_example.gif?raw=true)
+![Alt Text](https://github.com/jacobogabeiraspenas/UrbanSurfAce/blob/main/.various/UrbanSurfAce_example.gif?raw=true)

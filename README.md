@@ -23,3 +23,5 @@ The following code creates an interactive map that allows users to draw rectangl
 The result is an interactive map where users can draw rectangles, download OSM building data within the drawn area, and visualize this data on the map. It's a tool for exploring and working with building data in a geographic context.
 
 The `CustomControl` and `CustomControl2` classes handle the user interactions with the map, allowing users to trigger specific actions like downloading and displaying building data.
+
+![Alt Text](https://github.com/jacobogabeiraspenas/UrbanSurfAce/blob/main/UrbanSurfAce_example.gif?raw=true)

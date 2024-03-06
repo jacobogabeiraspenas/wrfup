@@ -451,6 +451,19 @@ class InteractiveMap:
 
 
     def calculate_URB_PARAM(self, nc_file_path=None, nc_file_path_to_save=None, json_data_path=None, save_temp_files=False):
+        """This function calculates several urban parameters and ingests them into their respectives fields. Once run, the geo_em file is saved as geo_em_modified.nc. This file and the new fields are accessible in the following variable.
+        
+            # Plan Area Fraction
+            self.new_geo_em_file[-1]['URB_PARAM'][0,90,:,:].plot()
+            # Mean Building Height
+            self.new_geo_em_file[-1]['URB_PARAM'][0,93,:,:].plot()
+            # Total Building Area
+            self.new_geo_em_file[-1]['URB_PARAM'][0,94,:,:].plot()
+            # Building Height Distribution (117-131)
+            for idx in range(117, 132):
+            self.new_geo_em_file[-1]['URB_PARAM'][0,idx,:,:].plot()
+            
+        """
         
         # Functions 
         # Function to merge touching polygons

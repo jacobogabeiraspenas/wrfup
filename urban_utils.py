@@ -19,6 +19,7 @@ import json
 import pandas as pd
 import shapely
 from shapely.geometry import shape, MultiPolygon, Polygon
+import fiona
 import math
 import netCDF4 as nc
 import warnings

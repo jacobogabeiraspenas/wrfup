@@ -19,7 +19,6 @@ import json
 import pandas as pd
 import shapely
 from shapely.geometry import shape, MultiPolygon, Polygon
-import fiona
 import math
 import netCDF4 as nc
 import warnings
@@ -721,7 +720,7 @@ class InteractiveMap:
 
         df_buildingAreaSurface = df_buildings[['south_north','west_east','properties.area','buildingSurface']].groupby(['south_north','west_east']).sum()
 
-        df_buildingsMeanHeight = df_buildings[['south_north','west_east','properties.height']].groupby(['south_north','west_east']).mean()
+        df_buildingsMeanHeight = (df_buildings[['properties.area']].values*df_buildings[['south_north','west_east','properties.height']]).groupby(['south_north','west_east']).mean()/df_buildingAreaSurface['properties.area'].values
 
         # Define the bin edges and labels
         bin_edges = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 2000]

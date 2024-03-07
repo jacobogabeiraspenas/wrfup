@@ -7,6 +7,7 @@ from ipyleaflet import (
     WidgetControl,
     LayersControl,
 )
+#Activate widgets
 from ipyleaflet import Map, DrawControl, basemap_to_tiles, basemaps, GeoJSON
 from ipywidgets import Button, Layout, VBox
 import xarray as xr

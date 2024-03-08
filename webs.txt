@@ -1,0 +1,3 @@
+https://land.copernicus.vgt.vito.be/PDF/portal/Application.html#Browse;Root=513186;Collection=1000322;DoSearch=true;Time=NORMAL,NORMAL,1,JULY,2020,5,MARCH,2024;ROI=-0.9461816,39.08442,0.182775,39.904232;isReserved=false
+
+

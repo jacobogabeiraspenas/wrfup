@@ -25,6 +25,7 @@ import math
 import netCDF4 as nc
 import warnings
 warnings.filterwarnings("ignore")
+#remove?
 
 # %%
 class InteractiveMap:

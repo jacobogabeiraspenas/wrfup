@@ -7,7 +7,10 @@ from ipyleaflet import (
     WidgetControl,
     LayersControl,
 )
-#Activate widgets
+#Activate widgets to have the map work
+#To do:
+#Include Microsoft buildings to contrast and collapse whats not at least 90%
+#Include urban fraction from vegetation fraction Copernicus
 from ipyleaflet import Map, DrawControl, basemap_to_tiles, basemaps, GeoJSON
 from ipywidgets import Button, Layout, VBox
 import xarray as xr

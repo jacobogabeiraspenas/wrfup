@@ -11,6 +11,8 @@ from ipyleaflet import (
 #To do:
 #Include Microsoft buildings to contrast and collapse whats not at least 90%
 #Include urban fraction from vegetation fraction Copernicus
+#Calculate building height distribuition properly (area)
+#Minimize number of levels
 from ipyleaflet import Map, DrawControl, basemap_to_tiles, basemaps, GeoJSON
 from ipywidgets import Button, Layout, VBox
 import xarray as xr

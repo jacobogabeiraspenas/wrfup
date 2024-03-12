@@ -622,7 +622,7 @@ class InteractiveMap:
             # Save the updated JSON data to a new file or overwrite the original file
         if save_temp_files:
             print('Saving temporary file...')
-            with open('temp_updated_file.json', 'w') as f:
+            with open(f'temp_updated_file_iteration_{j}.json', 'w') as f:
                 json.dump(data, f)
         else:
             pass

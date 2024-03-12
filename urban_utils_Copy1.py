@@ -701,26 +701,21 @@ class InteractiveMap:
             merged_polygons = merge_overlapping_polygons(polygons)
 
             
-            # No need anymore
-            '''
+            # Yes need anymore
             # Recalculate attributes for merged polygons
             new_features = []
-            for merged_polygon, properties in tqdm(merged_polygons):
-                new_properties = {
-                    'height': properties['height'],  # Keep height as it is
-                    'area': merged_polygon.area,     # Recalculate area
-                    'perimeter': merged_polygon.length  # Recalculate perimeter
-                }
+            for merged_polygon, properties, id_i, id_j in tqdm(merged_polygons):
                 new_feature = {
                     'type': 'Feature',
-                    'properties': new_properties,
+                    'properties': properties,
+                    'id_i': id_i,
+                    'id_j':id_j,
                     'geometry': merged_polygon.__geo_interface__
                 }
                 new_features.append(new_feature)
 
             # Update the original JSON data with the merged polygons and their attributes
             data['features'] = new_features
-            '''
 
             # Save the updated JSON data to a new file or overwrite the original file
         if save_temp_files:

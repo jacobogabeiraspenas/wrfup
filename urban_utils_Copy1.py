@@ -50,6 +50,15 @@ class InteractiveMap:
     new_geo_em_file = []
 
     def __init__(self, center=(40.41671327747509, -3.702635610085826), zoom=0):
+        
+        try:
+            import geocoder
+            lat_me, lon_me = geocoder.ip('me').latlng
+            center = (lat_me,lon_me)
+            zoom = 10
+        except:
+            pass
+        
         self.map = Map(basemap=self.basemap, center=center, zoom=zoom)
 
         # Create a DrawControl for drawing rectangles
@@ -690,7 +699,7 @@ class InteractiveMap:
 
         # Extract polygons and their attributes buffer, merge and debuffer
         print('Applying buffer and merging poligons...')
-        for i in range(4):
+        for i in range(1):
             j = i+1
             print(f'Iteration {j}/4...')
             # Extract polygons and their attributes, apply buffer
@@ -698,7 +707,10 @@ class InteractiveMap:
             polygons = [(shape(feature['geometry']).buffer(0.000005), feature['properties'], feature['id_i'],feature['id_j']) for feature in tqdm(data['features'])]
 
             # Merge overlapping polygons
-            merged_polygons = merge_overlapping_polygons(polygons)
+            merged_polygons = polygons
+            for i in range(4):
+                print(f'Iteration {j}/4...')
+                merged_polygons = merge_overlapping_polygons(merged_polygons)
 
             
             # Yes need anymore
@@ -718,12 +730,12 @@ class InteractiveMap:
             data['features'] = new_features
 
             # Save the updated JSON data to a new file or overwrite the original file
-        if save_temp_files:
-            print('Saving temporary file...')
-            with open(f'temp_updated_file_iteration_{j}.json', 'w') as f:
-                json.dump(data, f)
-        else:
-            pass
+            if save_temp_files:
+                print('Saving temporary file...')
+                with open(f'temp_updated_file_iteration_{j}.json', 'w') as f:
+                    json.dump(data, f)
+            else:
+                pass
 
 
         print('Reducing buffer to original size...')

@@ -603,7 +603,7 @@ class InteractiveMap:
 
             # Recalculate attributes for merged polygons
             new_features = []
-            for merged_polygon, properties in merged_polygons:
+            for merged_polygon, properties in tqdm(merged_polygons):
                 new_properties = {
                     'height': properties['height'],  # Keep height as it is
                     'area': merged_polygon.area,     # Recalculate area

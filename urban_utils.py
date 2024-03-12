@@ -496,8 +496,9 @@ class InteractiveMap:
         def merge_overlapping_polygons(polygons):
             merged_polygons = []
             processed_indices = set()
-
-            for i, (polygon1, properties1) in enumerate(polygons):
+            
+            print('Merging poligons...')
+            for i, (polygon1, properties1) in tqdm(enumerate(polygons)):
                 if i not in processed_indices:
                     overlapping_polygons = [polygon1]
 

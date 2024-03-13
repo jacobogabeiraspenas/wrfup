@@ -11,7 +11,7 @@ from ipyleaflet import (
 #To do:
 #Include Microsoft buildings to contrast and collapse whats not at least 90%
 #Include urban fraction from vegetation fraction Copernicus
-#Calculate building height distribuition properly (area)
+#Calculate building height distribuition properly (area) (check)
 #Minimize number of levels
 from ipyleaflet import Map, DrawControl, basemap_to_tiles, basemaps, GeoJSON
 from ipywidgets import Button, Layout, VBox
@@ -48,6 +48,7 @@ class InteractiveMap:
     isControlAdded = False
     geo_em_file = []
     new_geo_em_file = []
+    df_buildings_list =[]
 
     def __init__(self, center=(40.41671327747509, -3.702635610085826), zoom=0):
         self.map = Map(basemap=self.basemap, center=center, zoom=zoom)
@@ -457,7 +458,7 @@ class InteractiveMap:
             self.map.add_layer(geojson_layer)
 
 
-    def calculate_URB_PARAM(self, nc_file_path=None, nc_file_path_to_save=None, json_data_path=None, save_temp_files=False):
+    def calculate_URB_PARAM(self, nc_file_path=None, nc_file_path_to_save=None, json_data_path=None, save_temp_files=False, mask_with_LU_INDEX=False):
         """This function calculates several urban parameters and ingests them into their respectives fields. Once run, the geo_em file is saved as geo_em_modified.nc. This file and the new fields are accessible in the following variable.
         
             # Plan Area Fraction
@@ -506,6 +507,7 @@ class InteractiveMap:
                         if polygon1.overlaps(polygon2):  # Check for overlap instead of touch
                             overlapping_polygons.append(polygon2)
                             processed_indices.add(j)
+                            properties1['height*area']+=properties2['height*area']
 
                     merged_polygon = MultiPolygon(overlapping_polygons).buffer(0)  # No need to apply buffer again
                     merged_polygons.append((merged_polygon, properties1))
@@ -597,14 +599,17 @@ class InteractiveMap:
         
         new_features = []
         for polygon, properties in tqdm(polygons):
+            
+            polygon_area = polygon.area
             new_properties = {
                 'height': properties['height'],  # Keep height as it is
-                'area': polygon.area,     # Recalculate area
-                'perimeter': polygon.length  # Recalculate perimeter
+                'area': polygon_area,     # Recalculate area
+                'perimeter': polygon.length,  # Recalculate perimeter
+                'height*area':properties['height']*polygon_area
             }
             new_feature = {
                 'type': 'Feature',
-                'properties': properties,
+                'properties': new_properties,
                 'geometry': polygon.__geo_interface__
             }
             new_features.append(new_feature)
@@ -621,10 +626,13 @@ class InteractiveMap:
             # Recalculate attributes for merged polygons
             new_features = []
             for merged_polygon, properties in tqdm(merged_polygons):
+                
+                merged_polygon_area = merged_polygon.area
                 new_properties = {
-                    'height': properties['height'],  # Keep height as it is
-                    'area': merged_polygon.area,     # Recalculate area
-                    'perimeter': merged_polygon.length  # Recalculate perimeter
+                    'height': properties['height*area']/merged_polygon_area,  # Weighted height
+                    'area': merged_polygon_area,     # Recalculate area
+                    'perimeter': merged_polygon.length,  # Recalculate perimeter
+                    'height*area':properties['height*area']
                 }
                 new_feature = {
                     'type': 'Feature',
@@ -690,6 +698,7 @@ class InteractiveMap:
             area, perimeter = calculate_area_and_perimeter(feature['geometry'])
             # Add area and perimeter as fields in the properties of each shape
             feature['properties']['area'] = area/(delta_lat*delta_lon)
+            feature['properties']['area_deg'] = area
             feature['properties']['perimeter'] = 2*perimeter/(delta_lat+delta_lon)
 
         # Save the updated GeoJSON data to a new file
@@ -741,17 +750,22 @@ class InteractiveMap:
 
         print('Calculating URB_PARAM fields...')
         df_buildings = pd.json_normalize(data['features'])
+        
+        #NEW
+        self.df_buildings_list.append(df_buildings)
 
         df_buildings = df_buildings.rename(columns = {'properties.id_i':'south_north','properties.id_j':'west_east'})
 
         df_buildings['buildingSurface'] = df_buildings['properties.perimeter']*df_buildings['properties.height']+df_buildings['properties.area']
 
-        df_buildingAreaSurface = df_buildings[['south_north','west_east','properties.area','buildingSurface']].groupby(['south_north','west_east']).sum()
+        df_buildingAreaSurface = df_buildings[['south_north','west_east','properties.area','properties.area_deg','properties.height*area','buildingSurface']].groupby(['south_north','west_east']).sum()
 
-        df_buildingsMeanHeight = (df_buildings[['properties.area']].values*df_buildings[['south_north','west_east','properties.height']]).groupby(['south_north','west_east']).mean()/df_buildingAreaSurface['properties.area'].values
+        df_buildingAreaSurface['properties.height'] = df_buildingAreaSurface['properties.height*area'].values/df_buildingAreaSurface['properties.area_deg'].values
 
+        #OLD
+        '''
         # Define the bin edges and labels
-        bin_edges = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 2000]
+        bin_edges = [2.5, 7.5, 12.5, 17.5, 22.5, 27.5, 32.5, 37.5, 42.5, 47.5, 52.5, 57.5, 62.5, 67.5, 72.5, 2000]
         bin_labels = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75]
 
         # Create the 'heightDist' column
@@ -762,6 +776,29 @@ class InteractiveMap:
         df_buildingDist = df_buildingDist/df_buildingDist.groupby(['south_north','west_east']).sum()
 
         df_buildingDistPivot = df_buildingDist.reset_index().set_index(['south_north', 'west_east']).pivot(columns='heightDist',values='type')
+        '''
+        
+        #NEW
+        # Define the bin edges and labels
+        bin_edges = [2.5, 7.5, 12.5, 17.5, 22.5, 27.5, 32.5, 37.5, 42.5, 47.5, 52.5, 57.5, 62.5, 67.5, 72.5, 2000]
+        bin_labels = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75]
+
+        # Create the 'heightDist' column
+        df_buildings['heightDist'] = pd.cut(df_buildings['properties.height'], bins=bin_edges, labels=bin_labels)
+
+        # Calculate the building area
+        df_buildings['buildingArea'] = df_buildings['properties.height'] * df_buildings['properties.area']
+
+        # Group by grid cell and height distribution, and sum the building areas
+        df_buildingDist = df_buildings.groupby(['south_north', 'west_east', 'heightDist'])['buildingArea'].sum().reset_index()
+
+        # Group by grid cell and normalize the building areas
+        df_buildingDist['totalArea'] = df_buildingDist.groupby(['south_north', 'west_east'])['buildingArea'].transform('sum')
+        df_buildingDist['buildingDist'] = df_buildingDist['buildingArea'] / df_buildingDist['totalArea']
+
+        # Pivot the table to get the distribution by height bins as columns
+        df_buildingDistPivot = df_buildingDist.pivot_table(index=['south_north', 'west_east'], columns='heightDist', values='buildingDist', fill_value=0)
+
 
         df_lon_diff_c = df_latlon_c.diff()[['XLONG_C']]/delta_lon
         df_lat_diff_c = df_latlon_c.reset_index().set_index(['west_east_stag','south_north_stag']).sort_index().diff()[['XLAT_C']]/delta_lat
@@ -773,7 +810,7 @@ class InteractiveMap:
         df_grid_area[['south_north','west_east']] = df_grid_area[['south_north','west_east']]-1
         df_grid_area = df_grid_area.set_index(['south_north','west_east'])
 
-        df_URB_PARAM = df_latlon_m.join(df_grid_area).join(df_buildingAreaSurface).join(df_buildingsMeanHeight).join(df_buildingDistPivot)
+        df_URB_PARAM = df_latlon_m.join(df_grid_area).join(df_buildingAreaSurface).join(df_buildingDistPivot)
 
         df_URB_PARAM['plan_area_fraction'] = df_URB_PARAM['properties.area']/df_URB_PARAM['area_cell']
         # Create a boolean mask to identify rows where 'plan_area_fraction' is greater than 1
@@ -795,7 +832,10 @@ class InteractiveMap:
         # If you have a building height distribution, you can put it in the fields (i,j,118-132), every 5m
         dsxr['URB_PARAM'][0,117:] = df_URB_PARAM[bin_labels].values.T.reshape(15,shape_grid[0],shape_grid[1])
 
-        
+        if mask_with_LU_INDEX:
+            dsxr['URB_PARAM'] = dsxr['URB_PARAM'].where(dsxr['LU_INDEX']>29,0)
+        else:
+            pass
         
         # Save file
         if nc_file_path_to_save:

@@ -522,27 +522,85 @@ class InteractiveMap:
                     # Iterate per polygon
                     for i, (polygon1, properties1,id_i,id_j) in df_ij.iterrows():
                         if i not in processed_indices:
-                                overlapping_polygons = [polygon1]
+                            overlapping_polygons = [polygon1]
 
-                                # Check overlap with every other polygon
-                                for j, (polygon2, properties2,id_i,id_j) in df_ij.loc[i+1:].iterrows():
-                                    if polygon1.overlaps(polygon2):  # Check for overlap instead of touch
-                                        overlapping_polygons.append(polygon2)
-                                        processed_indices.add(j)
+                            # Check overlap with every other polygon
+                            polygon_found = 0
+                            for j, (polygon2, properties2,id_i,id_j) in df_ij.loc[i+1:].iterrows():
+                                if (polygon1.overlaps(polygon2)) & (polygon_found==0):  # Check for overlap instead of touch
+                                    overlapping_polygons.append(polygon2)
+                                    processed_indices.add(j)
 
-                                        # Execute merge
-                                        merged_polygon = MultiPolygon(overlapping_polygons).buffer(0) # No need to apply buffer again
+                                    # Execute merge
+                                    merged_polygon = MultiPolygon(overlapping_polygons).buffer(0) # No need to apply buffer again
 
-                                        # Calculate new atributes
-                                        p_merged_polygon = properties1.copy()
-                                        p_merged_polygon['id'] = i
-                                        p_merged_polygon['height'] = (properties1['height']*(properties1['planar_area']+1)+properties2['height']*(properties2['planar_area'])+1)/(properties1['planar_area']+1+properties2['planar_area']+1)  # Plus 1 is to avoid division by 0
-                                        p_merged_polygon['planar_area'] = properties1['planar_area']+properties2['planar_area']
-                                        p_merged_polygon['perimeter'] = merged_polygon.length*2/(delta_lat+delta_lon) #fix
+                                    # Calculate new atributes
+                                    p_merged_polygon = properties1.copy()
+                                    p_merged_polygon['id'] = i
+                                    p_merged_polygon['height'] = (properties1['height']*(properties1['planar_area']+1)+properties2['height']*(properties2['planar_area'])+1)/(properties1['planar_area']+1+properties2['planar_area']+1)  # Plus 1 is to avoid division by 0
+                                    p_merged_polygon['planar_area'] = properties1['planar_area']+properties2['planar_area']
+                                    p_merged_polygon['perimeter'] = merged_polygon.length*2/(delta_lat+delta_lon) #fix
 
-                                        # Append
-                                        merged_polygons.append((merged_polygon, p_merged_polygon,id_i,id_j))
+                                    # Append
+                                    merged_polygons.append((merged_polygon, p_merged_polygon,id_i,id_j))
+                                    
+                                    # Let loop know
+                                    polygon_found = 1
+                                    
 
+                            if polygon_found==0:
+                                # Append
+                                merged_polygons.append((polygon1, properties1,id_i,id_j))
+                                                                  
+            return merged_polygons
+        
+        
+        def merge_overlapping_polygons_old(polygons, delta_lat=9e-6, delta_lon=1e-5):
+            # Convert the list of polygons to a DataFrame
+            df_polygons = pd.DataFrame(polygons, columns=['polygon', 'properties', 'id_i', 'id_j'])
+            # Initialize an empty list to store merged polygons
+            merged_polygons = []
+            # Initialize a set to keep track of processed indices
+            processed_indices = set()
+
+            # Iterate over unique combinations of id_i and id_j
+            for id_i, id_j in tqdm(df_polygons[['id_i', 'id_j']].drop_duplicates().itertuples(index=False), total=len(df_polygons[['id_i', 'id_j']].drop_duplicates())):
+                # Subset DataFrame to current id_i and id_j
+                df_ij = df_polygons[(df_polygons['id_i'] == id_i) & (df_polygons['id_j'] == id_j)]
+
+                # Iterate over rows in the subset DataFrame
+                for i, (polygon1, properties1, _, _) in df_ij.iterrows():
+                    # Check if the current index has already been processed
+                    if i not in processed_indices:
+                        # Initialize a list to store overlapping polygons
+                        overlapping_polygons = [polygon1]
+                        # Initialize a flag to track if overlapping polygons are found
+                        polygon_found = False
+
+                        # Iterate over remaining rows to check for overlapping polygons
+                        for j, (polygon2, properties2, _, _) in df_ij.loc[i+1:].iterrows():
+                            # Check if polygons overlap and no overlapping polygon has been found yet
+                            if polygon1.intersects(polygon2) and not polygon_found:
+                                # Add overlapping polygon to the list
+                                overlapping_polygons.append(polygon2)
+                                # Add index of overlapping polygon to processed indices
+                                processed_indices.add(j)
+                                # Merge overlapping polygons
+                                merged_polygon = MultiPolygon(overlapping_polygons)
+                                # Update properties of merged polygon
+                                properties1['height'] = (properties1['height'] * (properties1['planar_area'] + 1) + properties2['height'] * (properties2['planar_area']) + 1) / (properties1['planar_area'] + 1 + properties2['planar_area'] + 1)
+                                properties1['planar_area'] += properties2['planar_area']
+                                properties1['perimeter'] = merged_polygon.length * 2 / (delta_lat + delta_lon)
+                                # Append merged polygon and updated properties to the list
+                                merged_polygons.append((merged_polygon, properties1, id_i, id_j))
+                                # Set flag to indicate overlapping polygon is found
+                                polygon_found = True
+
+                        # If no overlapping polygon is found, append the original polygon and its properties
+                        if not polygon_found:
+                            merged_polygons.append((polygon1, properties1, id_i, id_j))
+
+            # Return the list of merged polygons
             return merged_polygons
 
         # Function to reduce the buffer size of each polygon
@@ -704,12 +762,16 @@ class InteractiveMap:
             print(f'Iteration {j}/4...')
             # Extract polygons and their attributes, apply buffer
             
-            polygons = [(shape(feature['geometry']).buffer(0.000005), feature['properties'], feature['id_i'],feature['id_j']) for feature in tqdm(data['features'])]
+            #OLD
+            #polygons = [(shape(feature['geometry']).buffer(0.000003), feature['properties'], feature['id_i'],feature['id_j']) for feature in tqdm(data['features'])]
+            
+            #NEW
+            polygons = [(shape(feature['geometry']), feature['properties'], feature['id_i'],feature['id_j']) for feature in tqdm(data['features'])]
 
             # Merge overlapping polygons
             merged_polygons = polygons
-            for i in range(4):
-                print(f'Iteration {j}/4...')
+            for i in range(2):
+                print(f'Iteration {i}/2...')
                 merged_polygons = merge_overlapping_polygons(merged_polygons)
 
             

@@ -497,18 +497,18 @@ class InteractiveMap:
             merged_polygons = []
             processed_indices = set()
             
-            print('Merging poligons...')
-            for i, (polygon1, properties1) in tqdm(enumerate(polygons)):
+            #print('Merging poligons...')
+            for i, (polygon1, properties1, id_i, id_j) in tqdm(enumerate(polygons)):
                 if i not in processed_indices:
                     overlapping_polygons = [polygon1]
 
-                    for j, (polygon2, properties2) in enumerate(polygons[i+1:i+50], start=i+1):
+                    for j, (polygon2, properties2, id_i, id_j) in enumerate(polygons[i+1:], start=i+1):
                         if polygon1.overlaps(polygon2):  # Check for overlap instead of touch
                             overlapping_polygons.append(polygon2)
                             processed_indices.add(j)
 
-                    merged_polygon = MultiPolygon(overlapping_polygons).buffer(0)  # No need to apply buffer again
-                    merged_polygons.append((merged_polygon, properties1))
+                    merged_polygon = MultiPolygon(overlapping_polygons)  #.buffer(0)  # No need to apply buffer again
+                    merged_polygons.append((merged_polygon, properties1, id_i, id_j))
 
             return merged_polygons
 
@@ -586,41 +586,87 @@ class InteractiveMap:
             data['features'] = self.combined_rows.copy()
         else:
             print('Need a json file path for buildings')
+            
+            
+                # Calculation of URB_PARAM fields
+        dsxr = ncfile
 
+        df_lat_m = dsxr[['XLAT_M']]['XLAT_M'][0].to_dataframe()
+        df_lon_m = dsxr[['XLONG_M']]['XLONG_M'][0].to_dataframe()
+        df_latlon_m = df_lat_m.join(df_lon_m)
+        df_lat_c = dsxr[['XLAT_C']]['XLAT_C'][0].to_dataframe()
+        df_lon_c = dsxr[['XLONG_C']]['XLONG_C'][0].to_dataframe()
+        df_latlon_c = df_lat_c.join(df_lon_c)
 
-        # Extract polygons and their attributes
+        # check what point is each shape closer to
+        print('Assigning poligons to grid...')
+        # Function to find the nearest corner indices for a given point
+        max_distance = df_latlon_m.diff()['XLONG_M'].max()/1.2
+
+        
+        #NEW
+        for i,feature in enumerate(tqdm(data['features'])):
+            if feature['geometry']['type'] == 'Polygon':
+                point_coordinates = np.array(feature['geometry']['coordinates'][0]).mean(axis=0)
+                id_ij, dist_ij = find_nearest_indices(df_latlon_m, point_coordinates)
+                id_i, id_j  = id_ij
+                if dist_ij < max_distance:
+                    data['features'][i]['id_i'] = int(id_i)
+                    data['features'][i]['id_j'] = int(id_j)
+                else:
+                    data['features'][i]['id_i'] = -1000
+                    data['features'][i]['id_j'] = -1000
+
+            elif feature['geometry']['type'] == 'MultiPolygon':
+                point_coordinates = np.array(feature['geometry']['coordinates'][0][0]).mean(axis=0)
+                id_ij, dist_ij = find_nearest_indices(df_latlon_m, point_coordinates)
+                id_i, id_j  = id_ij
+                if dist_ij < max_distance:
+                    data['features'][i]['id_i'] = int(id_i)
+                    data['features'][i]['id_j'] = int(id_j)
+                else:
+                    data['features'][i]['id_i'] = -1000
+                    data['features'][i]['id_j'] = -1000
+        
+
+        # Extract polygons and their attributes, apply buffer    
         #polygons = [(shape(feature['geometry']), feature['properties']) for feature in data['features']]
+        polygons = [(shape(feature['geometry']).buffer(0.000005), feature['properties'], feature['id_i'],feature['id_j']) for feature in tqdm(data['features'])]
+        
+        
+
+        
 
         # Extract polygons and their attributes buffer, merge and debuffer
         print('Applying buffer and merging poligons...')
-        polygons = [(shape(feature['geometry']).buffer(0.00002), feature['properties']) for feature in tqdm(data['features'])]
-        
-        new_features = []
-        for polygon, properties in tqdm(polygons):
-            new_properties = {
-                'height': properties['height'],  # Keep height as it is
-                'area': polygon.area,     # Recalculate area
-                'perimeter': polygon.length  # Recalculate perimeter
-            }
-            new_feature = {
-                'type': 'Feature',
-                'properties': properties,
-                'geometry': polygon.__geo_interface__
-            }
-            new_features.append(new_feature)
-            
         for i in range(4):
             j = i+1
             print(f'Iteration {j}/4...')
-            # Extract polygons and their attributes, apply buffer
-            polygons = [(shape(feature['geometry']), feature['properties']) for feature in tqdm(new_features)]
+            # Pass it to dataframe to subset
+            if i==0:
+                df_polygons = pd.DataFrame(polygons,columns=['polygons','properties','id_i','id_j'])
+            else:
+                df_polygons = pd.DataFrame(merged_polygons,columns=['polygons','properties','id_i','id_j'])
 
-            # Merge overlapping polygons
-            merged_polygons = merge_overlapping_polygons(polygons)
+            merged_polygons = []
+            id_i_max = df_polygons['id_i'].max()
+            id_j_max = df_polygons['id_j'].max()
+            
+            
+            for id_i in tqdm(range(id_i_max)):
+                for id_j in range(id_j_max):
+                    # Subset
+                    df_ij = df_polygons.loc[(df_polygons['id_i']==id_i)&(df_polygons['id_j']==id_j)]
+                    polygons_ij = [(row[1]['polygons'], row[1]['properties'], row[1]['id_i'],row[1]['id_j']) for row in df_ij.iterrows()]
+                    # Merge overlapping polygons
+                    merged_polygons_ij = merge_overlapping_polygons(polygons_ij)
+                    
+                    # Extend
+                    merged_polygons.extend(merged_polygons_ij)
 
             # Recalculate attributes for merged polygons
             new_features = []
-            for merged_polygon, properties in tqdm(merged_polygons):
+            for merged_polygon, properties, id_i, id_j in tqdm(merged_polygons):
                 new_properties = {
                     'height': properties['height'],  # Keep height as it is
                     'area': merged_polygon.area,     # Recalculate area
@@ -629,28 +675,27 @@ class InteractiveMap:
                 new_feature = {
                     'type': 'Feature',
                     'properties': new_properties,
-                    'geometry': merged_polygon.__geo_interface__
+                    'geometry': merged_polygon.__geo_interface__,
+                    'id_i':id_i,
+                    'id_j':id_j
                 }
                 new_features.append(new_feature)
 
             # Update the original JSON data with the merged polygons and their attributes
-            new_data = {
-                'type': 'FeatureCollection',
-                'features': new_features
-            }
+            data['features'] = new_features
 
             # Save the updated JSON data to a new file or overwrite the original file
-            if save_temp_files:
-                print('Saving temporary file...')
-                with open(f'temp_updated_file_iteration_{j}.json', 'w') as f:
-                    json.dump(new_data, f)
-            else:
-                pass
+        if save_temp_files:
+            print('Saving temporary file...')
+            with open(f'temp_updated_file_iteration_{j}.json', 'w') as f:
+                json.dump(data, f)
+        else:
+            pass
 
 
         print('Reducing buffer to original size...')
         # Extract polygons and their attributes
-        polygons = [(shape(feature['geometry']), feature['properties']) for feature in new_data['features']]
+        polygons = [(shape(feature['geometry']), feature['properties']) for feature in data['features']]
 
         # Reduce the buffer size to its original value
         original_buffer_size = 0.00002  # Assuming original buffer size

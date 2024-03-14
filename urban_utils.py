@@ -510,7 +510,7 @@ class InteractiveMap:
             processed_indices = set()
             
             print('Merging poligons...')
-            for i, (polygon1, properties1) in tqdm(enumerate(polygons)):
+            for i, (polygon1, properties1) in enumerate(tqdm(polygons, leave=False)):
                 if i not in processed_indices:
                     overlapping_polygons = [polygon1]
 
@@ -629,7 +629,7 @@ class InteractiveMap:
             j = i+1
             print(f'Iteration {j}/4...')
             # Extract polygons and their attributes, apply buffer
-            polygons = [(shape(feature['geometry']), feature['properties']) for feature in tqdm(new_features)]
+            polygons = [(shape(feature['geometry']), feature['properties']) for feature in tqdm(new_features, leave=False)]
 
             # Merge overlapping polygons
             merged_polygons = merge_overlapping_polygons(polygons)

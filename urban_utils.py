@@ -51,6 +51,17 @@ class InteractiveMap:
     df_buildings_list =[]
 
     def __init__(self, center=(40.41671327747509, -3.702635610085826), zoom=0):
+        
+        # Get location for map
+        try:
+            import geocoder
+            lat_me, lon_me = geocoder.ip('me').latlng
+            center = (lat_me,lon_me)
+            zoom = 10
+        except:
+            pass
+        
+        # Create map with specifics
         self.map = Map(basemap=self.basemap, center=center, zoom=zoom)
 
         # Create a DrawControl for drawing rectangles

@@ -3,5 +3,8 @@ OSM_tiles
 Untitled*
 *json
 *.nc
-*tif
+urban_fraction_100m.tif
 *zoom2
+*zoom3
+FU_*
+data*

@@ -21,6 +21,8 @@ from tqdm.auto import tqdm
 import time
 import requests
 import os
+import zipfile
+import io
 import json
 import pandas as pd
 import shapely
@@ -858,7 +860,106 @@ class InteractiveMap:
             
         # Append new file
         self.new_geo_em_file.append(dsxr)
+        
+        
+        
+    # Urban Fraction
+    def get_urban_fraction_in_aoi(self):
 
+        # Get tiles in area of interest:
+        def lat_lon_to_urban_fraction_tile_in_aoi(lat, lon, grid_rows=16, grid_cols=16):
+            """
+            Convert latitude and longitude to a grid tile index, considering the dataset's specific latitude range.
+
+            Args:
+                lat (float): Latitude in degrees.
+                lon (float): Longitude in degrees.
+                grid_rows (int): Number of rows in the grid.
+                grid_cols (int): Number of columns in the grid.
+
+            Returns:
+                (int, int): A tuple (row_index, col_index) representing the tile's position.
+            """
+            # Adjust the latitude range from +84 to -60
+            lat_min = -60
+            lat_max = 84
+
+            # Normalize latitude and longitude to a 0-1 scale based on the dataset's coverage
+            lat_relative = (lat - lat_max) / (lat_min - lat_max)  # Adjusted for specific lat range
+            lon_relative = (lon + 180) / 360  # 0 on the left (west), 1 on the right (east)
+
+            # Calculate the tile indices
+            row_index = int(lat_relative * grid_rows)
+            col_index = int(lon_relative * grid_cols)
+
+            # Ensure indices are within the bounds of the grid
+            row_index = min(max(row_index, 0), grid_rows - 1)
+            col_index = min(max(col_index, 0), grid_cols - 1)
+
+            return row_index, col_index
+
+
+        # Get tiles names in area of interest:
+        def urban_fraction_tile_name_in_aoi(grid_rows=16, grid_cols=16):
+
+            tile_names = []
+            for lon, lat in self.aoi_extent_coordinates[0][0]:
+
+                row_index, col_index = lat_lon_to_urban_fraction_tile_in_aoi(lat, lon, 16, 16)
+                tile_name = f"{row_index:02d}_{col_index:02d}_zoom4_urban_fraction_100m_int8"
+                #print(f"The tile for latitude {lat} and longitude {lon} at zoom level 4 is: {tile_name}")
+
+                tile_names.append(tile_name)
+
+            return list(np.unique(tile_names))
+
+        def download_and_extract_zip(zip_url, extraction_path):
+            # Send a GET request to the URL
+            response = requests.get(zip_url)
+            # Check if the request was successful
+            if response.status_code == 200:
+                # Open the ZIP file contained in the response's bytes
+                with zipfile.ZipFile(io.BytesIO(response.content)) as thezip:
+                    # Extract all the contents into the specified directory
+                    thezip.extractall(extraction_path)
+                print("File successfully downloaded and extracted.")
+            else:
+                print(f"Failed to download the file. Status code: {response.status_code}")
+
+        def download_urban_fraction_tiles():
+            import os
+            import requests
+            import zipfile
+            import io
+
+            # Check and create directory
+            path2save = "Urban_Fraction_Tiles"
+            if os.path.exists(path2save):
+                print(f"Tiles will be stored in {path2save}")
+            else:
+                print(f"Creating directory to store files: {path2save}")
+                os.makedirs(path2save)
+
+            # Assuming tile_names and the construction of file_name are defined somewhere in your script
+            tile_names = urban_fraction_tile_name_in_aoi() # actual tile names
+            for tile_name in tqdm(tile_names):
+                file_name = f"{tile_name}.zip"  # Placeholder for actual logic to construct file_name
+                # URL of the ZIP file containing the TIFF
+                zip_file_url = f"https://github.com/jacobogabeiraspenas/UrbanSurfAce/raw/main/data/urban_fraction/zoom_4/{file_name}"
+
+                # Use the function and pass path2save as the extraction_path
+                download_and_extract_zip(zip_file_url, path2save)
+
+            return [f"{path2save}/{tile_name}.tif" for tile_name in tile_names]
+
+
+        # Download and save file locations
+        self.saved_urban_fraction_tiles = download_urban_fraction_tiles()
+
+
+
+#class UrbanFraction(InteractiveMap):
+    
 
 
 

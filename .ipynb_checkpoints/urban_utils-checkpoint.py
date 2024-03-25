@@ -7,6 +7,12 @@ from ipyleaflet import (
     WidgetControl,
     LayersControl,
 )
+#Activate widgets to have the map work
+#To do:
+#Include Microsoft buildings to contrast and collapse whats not at least 90%
+#Include urban fraction from vegetation fraction Copernicus
+#Calculate building height distribuition properly (area) (check)
+#Minimize number of levels
 from ipyleaflet import Map, DrawControl, basemap_to_tiles, basemaps, GeoJSON
 from ipywidgets import Button, Layout, VBox
 import xarray as xr
@@ -15,6 +21,8 @@ from tqdm.auto import tqdm
 import time
 import requests
 import os
+import zipfile
+import io
 import json
 import pandas as pd
 import shapely
@@ -24,6 +32,7 @@ import math
 import netCDF4 as nc
 import warnings
 warnings.filterwarnings("ignore")
+#remove?
 
 # %%
 class InteractiveMap:
@@ -41,8 +50,20 @@ class InteractiveMap:
     isControlAdded = False
     geo_em_file = []
     new_geo_em_file = []
+    df_buildings_list =[]
 
     def __init__(self, center=(40.41671327747509, -3.702635610085826), zoom=0):
+        
+        # Get location for map
+        try:
+            import geocoder
+            lat_me, lon_me = geocoder.ip('me').latlng
+            center = (lat_me,lon_me)
+            zoom = 10
+        except:
+            pass
+        
+        # Create map with specifics
         self.map = Map(basemap=self.basemap, center=center, zoom=zoom)
 
         # Create a DrawControl for drawing rectangles
@@ -450,7 +471,7 @@ class InteractiveMap:
             self.map.add_layer(geojson_layer)
 
 
-    def calculate_URB_PARAM(self, nc_file_path=None, nc_file_path_to_save=None, json_data_path=None, save_temp_files=False):
+    def calculate_URB_PARAM(self, nc_file_path=None, nc_file_path_to_save=None, json_data_path=None, save_temp_files=False, mask_with_LU_INDEX=False):
         """This function calculates several urban parameters and ingests them into their respectives fields. Once run, the geo_em file is saved as geo_em_modified.nc. This file and the new fields are accessible in the following variable.
         
             # Plan Area Fraction
@@ -489,15 +510,17 @@ class InteractiveMap:
         def merge_overlapping_polygons(polygons):
             merged_polygons = []
             processed_indices = set()
-
-            for i, (polygon1, properties1) in enumerate(polygons):
+            
+            print('Merging poligons...')
+            for i, (polygon1, properties1) in enumerate(tqdm(polygons, leave=False)):
                 if i not in processed_indices:
                     overlapping_polygons = [polygon1]
 
-                    for j, (polygon2, properties2) in enumerate(polygons[i+1:], start=i+1):
+                    for j, (polygon2, properties2) in enumerate(polygons[i+1:i+50], start=i+1):
                         if polygon1.overlaps(polygon2):  # Check for overlap instead of touch
                             overlapping_polygons.append(polygon2)
                             processed_indices.add(j)
+                            properties1['height*area']+=properties2['height*area']
 
                     merged_polygon = MultiPolygon(overlapping_polygons).buffer(0)  # No need to apply buffer again
                     merged_polygons.append((merged_polygon, properties1))
@@ -585,22 +608,44 @@ class InteractiveMap:
 
         # Extract polygons and their attributes buffer, merge and debuffer
         print('Applying buffer and merging poligons...')
+        polygons = [(shape(feature['geometry']).buffer(0.00002), feature['properties']) for feature in tqdm(data['features'])]
+        
+        new_features = []
+        for polygon, properties in tqdm(polygons):
+            
+            polygon_area = polygon.area
+            new_properties = {
+                'height': properties['height'],  # Keep height as it is
+                'area': polygon_area,     # Recalculate area
+                'perimeter': polygon.length,  # Recalculate perimeter
+                'height*area':properties['height']*polygon_area
+            }
+            new_feature = {
+                'type': 'Feature',
+                'properties': new_properties,
+                'geometry': polygon.__geo_interface__
+            }
+            new_features.append(new_feature)
+            
         for i in range(4):
             j = i+1
             print(f'Iteration {j}/4...')
             # Extract polygons and their attributes, apply buffer
-            polygons = [(shape(feature['geometry']).buffer(0.000005), feature['properties']) for feature in data['features']]
+            polygons = [(shape(feature['geometry']), feature['properties']) for feature in tqdm(new_features, leave=False)]
 
             # Merge overlapping polygons
             merged_polygons = merge_overlapping_polygons(polygons)
 
             # Recalculate attributes for merged polygons
             new_features = []
-            for merged_polygon, properties in merged_polygons:
+            for merged_polygon, properties in tqdm(merged_polygons):
+                
+                merged_polygon_area = merged_polygon.area
                 new_properties = {
-                    'height': properties['height'],  # Keep height as it is
-                    'area': merged_polygon.area,     # Recalculate area
-                    'perimeter': merged_polygon.length  # Recalculate perimeter
+                    'height': properties['height*area']/merged_polygon_area,  # Weighted height
+                    'area': merged_polygon_area,     # Recalculate area
+                    'perimeter': merged_polygon.length,  # Recalculate perimeter
+                    'height*area':properties['height*area']
                 }
                 new_feature = {
                     'type': 'Feature',
@@ -610,20 +655,23 @@ class InteractiveMap:
                 new_features.append(new_feature)
 
             # Update the original JSON data with the merged polygons and their attributes
-            data['features'] = new_features
+            new_data = {
+                'type': 'FeatureCollection',
+                'features': new_features
+            }
 
             # Save the updated JSON data to a new file or overwrite the original file
-        if save_temp_files:
-            print('Saving temporary file...')
-            with open('temp_updated_file.json', 'w') as f:
-                json.dump(data, f)
-        else:
-            pass
+            if save_temp_files:
+                print('Saving temporary file...')
+                with open(f'temp_updated_file_iteration_{j}.json', 'w') as f:
+                    json.dump(new_data, f)
+            else:
+                pass
 
 
         print('Reducing buffer to original size...')
         # Extract polygons and their attributes
-        polygons = [(shape(feature['geometry']), feature['properties']) for feature in data['features']]
+        polygons = [(shape(feature['geometry']), feature['properties']) for feature in new_data['features']]
 
         # Reduce the buffer size to its original value
         original_buffer_size = 0.00002  # Assuming original buffer size
@@ -663,6 +711,7 @@ class InteractiveMap:
             area, perimeter = calculate_area_and_perimeter(feature['geometry'])
             # Add area and perimeter as fields in the properties of each shape
             feature['properties']['area'] = area/(delta_lat*delta_lon)
+            feature['properties']['area_deg'] = area
             feature['properties']['perimeter'] = 2*perimeter/(delta_lat+delta_lon)
 
         # Save the updated GeoJSON data to a new file
@@ -714,17 +763,22 @@ class InteractiveMap:
 
         print('Calculating URB_PARAM fields...')
         df_buildings = pd.json_normalize(data['features'])
+        
+        #NEW
+        self.df_buildings_list.append(df_buildings)
 
         df_buildings = df_buildings.rename(columns = {'properties.id_i':'south_north','properties.id_j':'west_east'})
 
         df_buildings['buildingSurface'] = df_buildings['properties.perimeter']*df_buildings['properties.height']+df_buildings['properties.area']
 
-        df_buildingAreaSurface = df_buildings[['south_north','west_east','properties.area','buildingSurface']].groupby(['south_north','west_east']).sum()
+        df_buildingAreaSurface = df_buildings[['south_north','west_east','properties.area','properties.area_deg','properties.height*area','buildingSurface']].groupby(['south_north','west_east']).sum()
 
-        df_buildingsMeanHeight = df_buildings[['south_north','west_east','properties.height']].groupby(['south_north','west_east']).mean()
+        df_buildingAreaSurface['properties.height'] = df_buildingAreaSurface['properties.height*area'].values/df_buildingAreaSurface['properties.area_deg'].values
 
+        #OLD
+        '''
         # Define the bin edges and labels
-        bin_edges = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 2000]
+        bin_edges = [2.5, 7.5, 12.5, 17.5, 22.5, 27.5, 32.5, 37.5, 42.5, 47.5, 52.5, 57.5, 62.5, 67.5, 72.5, 2000]
         bin_labels = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75]
 
         # Create the 'heightDist' column
@@ -735,6 +789,29 @@ class InteractiveMap:
         df_buildingDist = df_buildingDist/df_buildingDist.groupby(['south_north','west_east']).sum()
 
         df_buildingDistPivot = df_buildingDist.reset_index().set_index(['south_north', 'west_east']).pivot(columns='heightDist',values='type')
+        '''
+        
+        #NEW
+        # Define the bin edges and labels
+        bin_edges = [2.5, 7.5, 12.5, 17.5, 22.5, 27.5, 32.5, 37.5, 42.5, 47.5, 52.5, 57.5, 62.5, 67.5, 72.5, 2000]
+        bin_labels = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75]
+
+        # Create the 'heightDist' column
+        df_buildings['heightDist'] = pd.cut(df_buildings['properties.height'], bins=bin_edges, labels=bin_labels)
+
+        # Calculate the building area
+        df_buildings['buildingArea'] = df_buildings['properties.height'] * df_buildings['properties.area']
+
+        # Group by grid cell and height distribution, and sum the building areas
+        df_buildingDist = df_buildings.groupby(['south_north', 'west_east', 'heightDist'])['buildingArea'].sum().reset_index()
+
+        # Group by grid cell and normalize the building areas
+        df_buildingDist['totalArea'] = df_buildingDist.groupby(['south_north', 'west_east'])['buildingArea'].transform('sum')
+        df_buildingDist['buildingDist'] = df_buildingDist['buildingArea'] / df_buildingDist['totalArea']
+
+        # Pivot the table to get the distribution by height bins as columns
+        df_buildingDistPivot = df_buildingDist.pivot_table(index=['south_north', 'west_east'], columns='heightDist', values='buildingDist', fill_value=0)
+
 
         df_lon_diff_c = df_latlon_c.diff()[['XLONG_C']]/delta_lon
         df_lat_diff_c = df_latlon_c.reset_index().set_index(['west_east_stag','south_north_stag']).sort_index().diff()[['XLAT_C']]/delta_lat
@@ -746,7 +823,7 @@ class InteractiveMap:
         df_grid_area[['south_north','west_east']] = df_grid_area[['south_north','west_east']]-1
         df_grid_area = df_grid_area.set_index(['south_north','west_east'])
 
-        df_URB_PARAM = df_latlon_m.join(df_grid_area).join(df_buildingAreaSurface).join(df_buildingsMeanHeight).join(df_buildingDistPivot)
+        df_URB_PARAM = df_latlon_m.join(df_grid_area).join(df_buildingAreaSurface).join(df_buildingDistPivot)
 
         df_URB_PARAM['plan_area_fraction'] = df_URB_PARAM['properties.area']/df_URB_PARAM['area_cell']
         # Create a boolean mask to identify rows where 'plan_area_fraction' is greater than 1
@@ -768,7 +845,10 @@ class InteractiveMap:
         # If you have a building height distribution, you can put it in the fields (i,j,118-132), every 5m
         dsxr['URB_PARAM'][0,117:] = df_URB_PARAM[bin_labels].values.T.reshape(15,shape_grid[0],shape_grid[1])
 
-        
+        if mask_with_LU_INDEX:
+            dsxr['URB_PARAM'] = dsxr['URB_PARAM'].where(dsxr['LU_INDEX']>29,0)
+        else:
+            pass
         
         # Save file
         if nc_file_path_to_save:
@@ -780,7 +860,106 @@ class InteractiveMap:
             
         # Append new file
         self.new_geo_em_file.append(dsxr)
+        
+        
+        
+    # Urban Fraction
+    def get_urban_fraction_in_aoi(self):
 
+        # Get tiles in area of interest:
+        def lat_lon_to_urban_fraction_tile_in_aoi(lat, lon, grid_rows=16, grid_cols=16):
+            """
+            Convert latitude and longitude to a grid tile index, considering the dataset's specific latitude range.
+
+            Args:
+                lat (float): Latitude in degrees.
+                lon (float): Longitude in degrees.
+                grid_rows (int): Number of rows in the grid.
+                grid_cols (int): Number of columns in the grid.
+
+            Returns:
+                (int, int): A tuple (row_index, col_index) representing the tile's position.
+            """
+            # Adjust the latitude range from +84 to -60
+            lat_min = -60
+            lat_max = 84
+
+            # Normalize latitude and longitude to a 0-1 scale based on the dataset's coverage
+            lat_relative = (lat - lat_max) / (lat_min - lat_max)  # Adjusted for specific lat range
+            lon_relative = (lon + 180) / 360  # 0 on the left (west), 1 on the right (east)
+
+            # Calculate the tile indices
+            row_index = int(lat_relative * grid_rows)
+            col_index = int(lon_relative * grid_cols)
+
+            # Ensure indices are within the bounds of the grid
+            row_index = min(max(row_index, 0), grid_rows - 1)
+            col_index = min(max(col_index, 0), grid_cols - 1)
+
+            return row_index, col_index
+
+
+        # Get tiles names in area of interest:
+        def urban_fraction_tile_name_in_aoi(grid_rows=16, grid_cols=16):
+
+            tile_names = []
+            for lon, lat in self.aoi_extent_coordinates[0][0]:
+
+                row_index, col_index = lat_lon_to_urban_fraction_tile_in_aoi(lat, lon, 16, 16)
+                tile_name = f"{row_index:02d}_{col_index:02d}_zoom4_urban_fraction_100m_int8"
+                #print(f"The tile for latitude {lat} and longitude {lon} at zoom level 4 is: {tile_name}")
+
+                tile_names.append(tile_name)
+
+            return list(np.unique(tile_names))
+
+        def download_and_extract_zip(zip_url, extraction_path):
+            # Send a GET request to the URL
+            response = requests.get(zip_url)
+            # Check if the request was successful
+            if response.status_code == 200:
+                # Open the ZIP file contained in the response's bytes
+                with zipfile.ZipFile(io.BytesIO(response.content)) as thezip:
+                    # Extract all the contents into the specified directory
+                    thezip.extractall(extraction_path)
+                print("File successfully downloaded and extracted.")
+            else:
+                print(f"Failed to download the file. Status code: {response.status_code}")
+
+        def download_urban_fraction_tiles():
+            import os
+            import requests
+            import zipfile
+            import io
+
+            # Check and create directory
+            path2save = "Urban_Fraction_Tiles"
+            if os.path.exists(path2save):
+                print(f"Tiles will be stored in {path2save}")
+            else:
+                print(f"Creating directory to store files: {path2save}")
+                os.makedirs(path2save)
+
+            # Assuming tile_names and the construction of file_name are defined somewhere in your script
+            tile_names = urban_fraction_tile_name_in_aoi() # actual tile names
+            for tile_name in tqdm(tile_names):
+                file_name = f"{tile_name}.zip"  # Placeholder for actual logic to construct file_name
+                # URL of the ZIP file containing the TIFF
+                zip_file_url = f"https://github.com/jacobogabeiraspenas/UrbanSurfAce/raw/main/data/urban_fraction/zoom_4/{file_name}"
+
+                # Use the function and pass path2save as the extraction_path
+                download_and_extract_zip(zip_file_url, path2save)
+
+            return [f"{path2save}/{tile_name}.tif" for tile_name in tile_names]
+
+
+        # Download and save file locations
+        self.saved_urban_fraction_tiles = download_urban_fraction_tiles()
+
+
+
+#class UrbanFraction(InteractiveMap):
+    
 
 
 

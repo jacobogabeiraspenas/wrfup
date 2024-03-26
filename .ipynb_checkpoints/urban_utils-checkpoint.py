@@ -30,6 +30,10 @@ from shapely.geometry import shape, MultiPolygon, Polygon
 import fiona
 import math
 import netCDF4 as nc
+import rasterio
+from rasterio.merge import merge
+from rasterio.plot import show
+from rasterio.windows import from_bounds
 import warnings
 warnings.filterwarnings("ignore")
 #remove?
@@ -860,7 +864,7 @@ class InteractiveMap:
             
         # Append new file
         self.new_geo_em_file.append(dsxr)
-        
+        self.geo_em_file.append(dsxr)
         
         
     # Urban Fraction
@@ -955,8 +959,247 @@ class InteractiveMap:
 
         # Download and save file locations
         self.saved_urban_fraction_tiles = download_urban_fraction_tiles()
+        
+        # If there are several tiff files to merge
+        # Function to merge tiff files and save the result
+        def merge_and_save_tiffs(tiff_paths, output_path):
+            # Open the TIFF files
+            src_files_to_mosaic = [rasterio.open(fp) for fp in tiff_paths]
 
+            # Merge function returns a single mosaic array and the transformation info
+            mosaic, out_trans = merge(src_files_to_mosaic)
 
+            # Define metadata for the output file, starting with a copy from one of the inputs
+            out_meta = src_files_to_mosaic[0].meta.copy()
+
+            # Update the metadata to reflect the number of layers, the new transform, and the new dimensions
+            out_meta.update({
+                "driver": "GTiff",
+                "height": mosaic.shape[1],
+                "width": mosaic.shape[2],
+                "transform": out_trans,
+                # If needed, update other metadata fields such as "crs" (Coordinate Reference System)
+            })
+
+            # Write the mosaic to a new file
+            with rasterio.open(output_path, "w", **out_meta) as dest:
+                dest.write(mosaic)
+
+            # Cleanup: close the source files
+            for src in src_files_to_mosaic:
+                src.close()
+
+            # Optionally, show the mosaic for visual inspection
+            # with rasterio.open(output_path) as src:
+            #     show(src, cmap='viridis')
+            
+        
+
+        # Define the path to the output merged TIFF file
+        output_path = "Urban_Fraction_Tiles/merged.tif"
+
+        # Assuming your TIFF files are in 'Urban_Fraction_Tiles' directory
+        tiff_paths = [tiff_path for tiff_path in self.saved_urban_fraction_tiles]
+
+        # Merge the TIFFs and save the output
+        merge_and_save_tiffs(tiff_paths, output_path)
+            
+
+    def calculate_FRC_URB2D(self, path_to_urban_fraction_tiff=None, path_to_geo_em_file=None):
+        
+        def add_frc_urb2d_field_if_not_exists(geo_em, reference_field='CLAYFRAC', new_field_name='FRC_URB2D'):
+            """
+            Adds a new DataArray field to the geo_em dataset, initialized to zeros,
+            with the same dimensions and structure as an existing reference field,
+            if the new field does not already exist in the dataset.
+
+            Parameters:
+            - geo_em: xarray Dataset, the geo_em file dataset to modify.
+            - reference_field: str, the name of the field in geo_em to use as a reference for dimensions and structure.
+            - new_field_name: str, the name for the new field to be added if it doesn't already exist.
+
+            Returns:
+            - geo_em: xarray Dataset, potentially modified with the new field added.
+            """
+
+            # Check if the new field already exists
+            if new_field_name in geo_em:
+                print(f"The field '{new_field_name}' already exists in the geo_em dataset.")
+                return geo_em
+
+            # If the field does not exist, proceed to add it
+            # Retrieve the dimensions, shape, and attributes of the reference field
+            ref_shape = geo_em[reference_field].shape
+            ref_dims = geo_em[reference_field].dims
+            ref_attrs = geo_em[reference_field].attrs.copy()
+
+            # Create a new DataArray with zeros, matching the reference field's dimensions and shape
+            new_field_values = np.zeros(ref_shape, dtype=np.float32)
+            new_field = xr.DataArray(new_field_values, dims=ref_dims, name=new_field_name, attrs=ref_attrs)
+
+            # Modify attributes specific to the new field as necessary
+            new_field.attrs['description'] = 'Urban Fraction'
+
+            # Add the new field to the geo_em dataset
+            geo_em[new_field_name] = new_field
+
+            print(f"The field '{new_field_name}' has been added to the geo_em dataset.")
+            return geo_em
+
+        
+        def open_tiff_as_xarray(tiff_path):
+            """
+            Opens a TIFF file at the specified path and returns it as an xarray DataArray with geographical coordinates.
+
+            Parameters:
+            - tiff_path: str, path to the TIFF file.
+
+            Returns:
+            - xarray.DataArray representing the raster data with geographical coordinates.
+            """
+            with rasterio.open(tiff_path) as src:
+                # Read the raster data
+                data = src.read()
+
+                # Obtain the geographic transformation matrix
+                transform = src.transform
+
+                # Generate 2D arrays of longitude and latitude values
+                lon, lat = np.meshgrid(np.arange(src.width), np.arange(src.height))
+                lon, lat = rasterio.transform.xy(transform, lat, lon, offset='center')
+
+                # Adjust dims and coords based on actual latitudes and longitudes
+                da = xr.DataArray(data, dims=("band", "y", "x"),
+                                  coords={"lon": (("y", "x"), lon),
+                                          "lat": (("y", "x"), lat)})
+
+                # Optionally, set the CRS attribute if you plan to use it later
+                da.attrs['crs'] = src.crs
+
+            return da
+
+        def crop_tiff_to_geo_em_area(input_tiff_path, output_tiff_path, geo_em):
+            """
+            Crop a TIFF file to the area covered by a geo_em file and save the cropped area as a new TIFF.
+
+            Parameters:
+            - input_tiff_path: str, path to the input merged TIFF file.
+            - output_tiff_path: str, path to save the cropped TIFF file.
+            - geo_em: xarray Dataset, the geo_em file with latitude ('XLAT_M' or 'XLAT') and longitude ('XLONG_M' or 'XLONG') variables.
+            """
+            # Open the input TIFF file
+            with rasterio.open(input_tiff_path) as src:
+                # Get the bounds from the geo_em file
+                lat_min, lat_max = np.min(geo_em['XLAT_M']), np.max(geo_em['XLAT_M'])
+                lon_min, lon_max = np.min(geo_em['XLONG_M']), np.max(geo_em['XLONG_M'])
+
+                # Convert the geo_em bounds to the input TIFF's coordinate system
+                # This step assumes that both the geo_em file and the input TIFF are in the same CRS.
+                # If not, you would need to transform the coordinates accordingly.
+                window = from_bounds(lon_min, lat_min, lon_max, lat_max, src.transform)
+
+                # Read the data from the window
+                window_transform = src.window_transform(window)
+                data = src.read(window=window)
+
+                # Define metadata for the output file
+                out_meta = src.meta.copy()
+                out_meta.update({
+                    "driver": "GTiff",
+                    "height": data.shape[1],
+                    "width": data.shape[2],
+                    "transform": window_transform
+                })
+
+                # Write the cropped data to a new file
+                with rasterio.open(output_tiff_path, "w", **out_meta) as dest:
+                    dest.write(data)
+                    
+
+        def crop_opened_tiff_by_lat_lon_bounds_and_return_mosaic(src, lat_min, lat_max, lon_min, lon_max):
+            """
+            Crop an open rasterio dataset to the specified latitude and longitude bounds and return the cropped mosaic as a numpy array.
+
+            Parameters:
+            - src: rasterio.io.DatasetReader, an open rasterio dataset.
+            - lat_min: float, minimum latitude of the cropping boundary.
+            - lat_max: float, maximum latitude of the cropping boundary.
+            - lon_min: float, minimum longitude of the cropping boundary.
+            - lon_max: float, maximum longitude of the cropping boundary.
+
+            Returns:
+            - numpy.ndarray: The cropped mosaic array.
+            - rasterio.transform.Affine: The transformation of the cropped mosaic.
+            """
+            # Convert the provided lat-lon bounds to the input TIFF's coordinate system
+            window = from_bounds(lon_min, lat_min, lon_max, lat_max, src.transform)
+
+            # Read the data from the window
+            window_transform = src.window_transform(window)
+            mosaic = src.read(window=window)
+
+            # Return the mosaic and its transform
+            return mosaic, window_transform
+
+                    
+        
+        
+        # Check paths
+        if not path_to_urban_fraction_tiff:
+            input_tiff_path = "Urban_Fraction_Tiles/merged.tif"
+            output_tiff_path = "Urban_Fraction_Tiles/cropped.tif"
+            path_to_cropped_tiff = "Urban_Fraction_Tiles/cropped.tif"
+        else:
+            input_tiff_path = path_to_urban_fraction_tiff
+            output_tiff_path = "Urban_Fraction_Tiles/cropped.tif"
+            path_to_cropped_tiff = "Urban_Fraction_Tiles/cropped.tif"
+        
+        if not path_to_geo_em_file:
+            geo_em = self.geo_em_file[-1]
+        else:
+            geo_em = xr.load_dataset(path_to_geo_em_file)
+        
+        # Execute crop and save
+        crop_tiff_to_geo_em_area(input_tiff_path, output_tiff_path, geo_em)
+        
+        # Assuming self.geo_em_file[-1] is the geo_em Dataset
+        geo_em = self.geo_em_file[-1]
+        geo_em = add_frc_urb2d_field_if_not_exists(geo_em)
+        # Now geo_em contains the new FRC_URB2D field, initialized to zeros, if it did not exist already
+        # Open the TIFF file beforehand
+        with rasterio.open(path_to_cropped_tiff) as src:
+            # Define your latitude and longitude corners of the geo_em 
+            lats_c_geo_em = self.geo_em_file[-1]['XLAT_C'][0]
+            lons_c_geo_em = self.geo_em_file[-1]['XLONG_C'][0]
+
+            # Define the array in which we will store the urban fraction
+            lats_m_geo_em = self.geo_em_file[-1]['XLAT_M'][0]
+            urban_fraction_geo_em = np.zeros(lats_m_geo_em.shape[0]*lats_m_geo_em.shape[1]).reshape(lats_m_geo_em.shape)
+
+            range_lat = lats_c_geo_em.shape[0]
+            range_lon = lats_c_geo_em.shape[1]
+
+            for i in tqdm(range(range_lat-1)):
+                for j in range(range_lon-1):
+                    lat_min, lat_max = lats_c_geo_em[i,j], lats_c_geo_em[i+1,j+1]  # Example latitude bounds
+                    lon_min, lon_max = lons_c_geo_em[i,j], lons_c_geo_em[i+1,j+1] 
+                    # Crop the open dataset
+                    mosaic, transform = crop_opened_tiff_by_lat_lon_bounds_and_return_mosaic(src, lat_min, lat_max, lon_min, lon_max)
+                    urban_fraction_geo_em[i,j] = np.mean(mosaic)
+
+            # Now `mosaic` is the numpy array of the cropped image, and `transform` is its geotransform
+            # Insert field in geo_em file
+            geo_em['FRC_URB2D'][0] = urban_fraction_geo_em
+            # Append the modified geo_em dataset to the list
+            self.geo_em_file.append(geo_em)
+            # Save the dataset to a file, adjust 'path_to_save' to your desired file path
+            path_to_save = "geo_em_modified_urban_fraction.nc"
+            geo_em.to_netcdf(path_to_save)
+            print(f"The new geo_em file has been saved as {path_to_save}")
+        
+
+            
+        
 
 #class UrbanFraction(InteractiveMap):
     

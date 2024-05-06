@@ -9,3 +9,4 @@ urban_fraction_100m.tif
 data/FU_tiles*
 *tif
 Urban_Frac*
+data/urban_fraction/zoom_4/*.zip

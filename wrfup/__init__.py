@@ -15,14 +15,14 @@ Modules:
     - utils: Utility functions (e.g., clean-up and file validation).
 """
 
-# Import essential components of the package
-from .main import main
-from .info import Info
-from .download import download_fields
-from .calculation import calculate_fields
-from .ingest import ingest_fields
-from .utils import clean_up, check_geo_em_file
+# # Import essential components of the package
+# from .main import main
+# from .info import Info
+# from .download import download_fields
+# from .calculation import calculate_fields
+# from .ingest import ingest_fields
+# from .utils import clean_up, check_geo_em_file
 
-# Define the package version
-__version__ = "0.1.0"
-# wrfup module initialization
+# # Define the package version
+# __version__ = "0.1.0"
+# # wrfup module initialization

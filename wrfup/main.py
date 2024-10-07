@@ -1,11 +1,12 @@
 # main.py in wrfup
 import argparse
 import logging
+import os
 from wrfup.info import Info
-from wrfup.download import download_fields
-from wrfup.calculation import calculate_fields
+from wrfup.download import download_tiles, get_tile_names_in_aoi
 from wrfup.ingest import ingest_fields
-from wrfup.utils import clean_up, check_geo_em_file
+from wrfup.utils import clean_up, check_geo_em_file, get_lat_lon_extent
+from wrfup.calculation import calculate_frc_urb2d
 
 # Configure logging
 logging.basicConfig(
@@ -17,24 +18,26 @@ logging.basicConfig(
     ]
 )
 
-def main(argv=None):
-    """
-    Main entry point for wrfup package.
-    Parses command-line arguments and coordinates downloading fields,
-    performing calculations, and ingesting fields into the WRF geo_em file.
-    """
+# Hardcoded download URLs for urban fraction and URB_PARAM tiles
+FRC_URB2D_URL = "https://github.com/jacobogabeiraspenas/UrbanData01/raw/main/data/00_UrbanFraction/zoom_4_complete"
+URB_PARAM_URL = "https://github.com/jacobogabeiraspenas/UrbanData01/raw/main/data/01_URB_PARAM/zoom_4"
 
+def main(argv=None):
+    """Main entry point for wrfup package."""
+    
     parser = argparse.ArgumentParser(
         description="Ingest urban data (FRC_URB2D, URB_PARAM) into geo_em.d0X.nc file."
     )
 
     # Required arguments
     parser.add_argument('geo_em_file', type=str, help="Path to the WRF geo_em.d0X.nc file.")
-    parser.add_argument('field', type=str, choices=['FRC_URB2D', 'URB_PARAM'],
+    parser.add_argument('field', type=str, choices=['FRC_URB2D', 'URB_PARAM'], 
                         help="Field to ingest into the geo_em file.")
-
+    
     # Optional arguments
-    parser.add_argument('--temp_dir', type=str, default='./temp',
+    parser.add_argument('--work_dir', type=str, default='./workdir', 
+                        help="Working directory where geo_em files and output will be stored (default: ./workdir).")
+    parser.add_argument('--temp_dir', type=str, default='./temp', 
                         help="Directory for temporary files (default: ./temp).")
 
     args = parser.parse_args(argv)
@@ -42,27 +45,50 @@ def main(argv=None):
     # Create an Info object to store paths and configuration
     info = Info.from_argparse(args)
 
-    # Step 1: Check the geo_em file for required fields
+    # Step 1: Check the geo_em file for required fields and return the dataset
+    geo_em_path = os.path.join(info.work_dir, info.geo_em_file)
     logging.info("Checking the geo_em file for required fields...")
-    if not check_geo_em_file(info.geo_em_file, info.field):
+    ds = check_geo_em_file(geo_em_path, info.field)
+    if ds is None:
         logging.error(f"Required field {info.field} is missing from the geo_em file. Exiting...")
         return 1
 
-    # Step 2: Download necessary fields
-    logging.info("Downloading fields...")
-    download_fields(info)
+    # Step 2: Create field-specific directory inside the work directory
+    field_dir = os.path.join(info.temp_dir, info.field)
+    if not os.path.exists(field_dir):
+        os.makedirs(field_dir)
 
-    # Step 3: Perform calculations to prepare data for ingestion
-    logging.info("Calculating fields...")
-    calculated_data = calculate_fields(info)
+    # Step 3: Get latitude/longitude extent from geo_em file
+    lat_min, lat_max, lon_min, lon_max = get_lat_lon_extent(geo_em_path)
 
-    # Step 4: Ingest fields into the geo_em file
-    logging.info(f"Ingesting {args.field} into the geo_em file...")
-    ingest_fields(info, calculated_data)
+    # Step 4: Get tile names based on geo_em file’s extent
+    tile_names = get_tile_names_in_aoi(lat_min, lat_max, lon_min, lon_max, info.field)
 
-    # Step 5: Clean up temporary files
-    logging.info("Cleaning up temporary files...")
-    clean_up(info.temp_dir)
+
+    # Step 5: Download the necessary tiles based on field
+    if info.field == 'FRC_URB2D':
+        download_tiles(tile_names, field_dir, FRC_URB2D_URL)
+    elif info.field == 'URB_PARAM':
+        download_tiles(tile_names, field_dir, URB_PARAM_URL)
+
+    # Step 6: Perform calculations to prepare data for ingestion
+    if info.field == 'FRC_URB2D':
+        merged_tiff_path = os.path.join(field_dir, 'merged_tiles.tif')
+        logging.info("Calculating FRC_URB2D field...")
+        ds = calculate_frc_urb2d(info, ds, merged_tiff_path)
+
+    # Step 7: Ingest fields into the geo_em file
+    logging.info(f"Ingesting {info.field} into the geo_em file...")
+
+    # Write to a temporary file first
+    output_geo_em_path = geo_em_path.replace('.nc', '_modified.nc')
+    ds.to_netcdf(output_geo_em_path)
+    logging.info(f"Modified geo_em file saved to {output_geo_em_path}")
+
+
+    # # Step 8: Clean up temporary files
+    # logging.info("Cleaning up temporary files...")
+    # clean_up(info.temp_dir)
 
     logging.info("Process completed successfully.")
     return 0
@@ -70,4 +96,3 @@ def main(argv=None):
 if __name__ == "__main__":
     import sys
     sys.exit(main())
-

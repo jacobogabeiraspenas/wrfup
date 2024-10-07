@@ -1,26 +1,22 @@
 # info.py in wrfup
-import os
-from typing import NamedTuple
+# info.py
 
-class Info(NamedTuple):
+class Info:
     """
-    Immutable class that stores configuration details such as file paths and options.
-    This class will be used to pass necessary information between different modules.
+    Store configuration and paths for processing.
     """
-    geo_em_file: str         # Path to the geo_em.d0X.nc file
-    temp_dir: str            # Directory for temporary files
-    field: str               # Field to ingest (FRC_URB2D or URB_PARAM)
+    
+    def __init__(self, geo_em_file, field, work_dir, temp_dir):
+        self.geo_em_file = geo_em_file
+        self.field = field
+        self.work_dir = work_dir  # Add this line to store work_dir
+        self.temp_dir = temp_dir
 
     @classmethod
-    def from_argparse(cls, args) -> 'Info':
-        """
-        Create an Info instance from the argparse Namespace.
-        This method extracts the necessary fields from argparse arguments and
-        constructs the Info object.
-        """
+    def from_argparse(cls, args):
         return cls(
             geo_em_file=args.geo_em_file,
+            field=args.field,
+            work_dir=args.work_dir,  # Add this to capture from argparse
             temp_dir=args.temp_dir,
-            field=args.field
         )
-

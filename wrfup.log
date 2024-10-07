@@ -272,3 +272,233 @@
 2024-10-07 14:46:15,095 - INFO - Ingesting FRC_URB2D into the geo_em file...
 2024-10-07 14:46:15,153 - INFO - Modified geo_em file saved to 00test/geo_em_test_madrid_modified.nc
 2024-10-07 14:46:15,153 - INFO - Process completed successfully.
+2024-10-07 15:08:06,530 - INFO - Checking the geo_em file for required fields...
+2024-10-07 15:08:06,700 - INFO - All required fields are present in the geo_em file.
+2024-10-07 15:08:22,069 - INFO - Checking the geo_em file for required fields...
+2024-10-07 15:08:22,150 - INFO - All required fields are present in the geo_em file.
+2024-10-07 15:08:43,649 - INFO - File downloaded and extracted: https://github.com/jacobogabeiraspenas/UrbanData01/raw/main/data/01_URB_PARAM/zoom_4/04_07_zoom4_URB_PARAM_100m.zip
+2024-10-07 15:08:43,650 - INFO - Only one tile downloaded. No merging required.
+2024-10-07 15:08:43,650 - INFO - Calculating URB_PARAM fields...
+2024-10-07 15:08:55,546 - INFO - Ingesting URB_PARAM into the geo_em file...
+2024-10-07 15:11:48,690 - INFO - Checking the geo_em file for required fields...
+2024-10-07 15:11:48,777 - INFO - All required fields are present in the geo_em file.
+2024-10-07 15:12:01,530 - INFO - File downloaded and extracted: https://github.com/jacobogabeiraspenas/UrbanData01/raw/main/data/01_URB_PARAM/zoom_4/04_07_zoom4_URB_PARAM_100m.zip
+2024-10-07 15:12:01,531 - INFO - Only one tile downloaded. No merging required.
+2024-10-07 15:12:01,531 - INFO - Calculating URB_PARAM fields...
+2024-10-07 15:12:12,776 - INFO - Ingesting URB_PARAM into the geo_em file...
+2024-10-07 15:12:12,836 - INFO - Modified geo_em file saved to 00test/geo_em_test_madrid_modified.nc
+2024-10-07 15:12:12,836 - INFO - Process completed successfully.
+2024-10-07 15:26:05,009 - INFO - Checking the geo_em file for required fields...
+2024-10-07 15:26:05,159 - INFO - All required fields are present in the geo_em file.
+2024-10-07 15:26:40,719 - INFO - File downloaded and extracted: https://github.com/jacobogabeiraspenas/UrbanData01/raw/main/data/01_URB_PARAM/zoom_4/04_07_zoom4_URB_PARAM_100m.zip
+2024-10-07 15:26:40,720 - INFO - Only one tile downloaded. No merging required.
+2024-10-07 15:26:40,720 - INFO - Calculating URB_PARAM fields...
+2024-10-07 15:26:52,638 - INFO - Ingesting URB_PARAM into the geo_em file...
+2024-10-07 15:26:52,698 - INFO - Modified geo_em file saved to 00test/geo_em_test_madrid_modified.nc
+2024-10-07 15:26:52,698 - INFO - Process completed successfully.
+2024-10-07 15:29:58,587 - INFO - Checking the geo_em file for required fields...
+2024-10-07 15:29:58,679 - INFO - All required fields are present in the geo_em file.
+2024-10-07 15:30:24,623 - INFO - File downloaded and extracted: https://github.com/jacobogabeiraspenas/UrbanData01/raw/main/data/01_URB_PARAM/zoom_4/04_07_zoom4_URB_PARAM_100m.zip
+2024-10-07 15:30:24,624 - INFO - Only one tile downloaded. No merging required.
+2024-10-07 15:30:24,624 - INFO - Calculating URB_PARAM fields...
+2024-10-07 15:30:24,796 - INFO - Ingesting URB_PARAM into the geo_em file...
+2024-10-07 15:30:24,886 - INFO - Modified geo_em file saved to 00test/geo_em_test_madrid_modified.nc
+2024-10-07 15:30:24,886 - INFO - Process completed successfully.
+2024-10-07 15:32:56,847 - INFO - Checking the geo_em file for required fields...
+2024-10-07 15:32:56,936 - INFO - All required fields are present in the geo_em file.
+2024-10-07 15:33:50,111 - INFO - File downloaded and extracted: https://github.com/jacobogabeiraspenas/UrbanData01/raw/main/data/01_URB_PARAM/zoom_4/04_08_zoom4_URB_PARAM_100m.zip
+2024-10-07 15:34:01,207 - INFO - File downloaded and extracted: https://github.com/jacobogabeiraspenas/UrbanData01/raw/main/data/01_URB_PARAM/zoom_4/04_07_zoom4_URB_PARAM_100m.zip
+2024-10-07 15:34:01,240 - WARNING - CPLE_AppDefined in PROJ: internal_proj_create_from_database: /Users/gabeiras3j/opt/anaconda3/envs/repre/share/proj/proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 3 is expected. It comes from another PROJ installation.
+2024-10-07 15:34:01,283 - WARNING - CPLE_AppDefined in PROJ: internal_proj_create_from_database: /Users/gabeiras3j/opt/anaconda3/envs/repre/share/proj/proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 3 is expected. It comes from another PROJ installation.
+2024-10-07 15:34:01,872 - WARNING - CPLE_AppDefined:PROJ: internal_proj_create_from_database: /Users/gabeiras3j/opt/anaconda3/envs/repre/share/proj/proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 3 is expected. It comes from another PROJ installation.
+2024-10-07 15:34:14,381 - WARNING - CPLE_AppDefined:PROJ: internal_proj_create_from_database: /Users/gabeiras3j/opt/anaconda3/envs/repre/share/proj/proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 3 is expected. It comes from another PROJ installation.
+2024-10-07 15:34:24,921 - INFO - GDAL signalled an error: err_no=1, msg='PROJ: internal_proj_create_from_name: /Users/gabeiras3j/opt/anaconda3/envs/repre/share/proj/proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 3 is expected. It comes from another PROJ installation.'
+2024-10-07 15:34:30,470 - INFO - Compressed merged file saved at ./temp/URB_PARAM/merged_tiles.tif
+2024-10-07 15:34:30,512 - INFO - Calculating URB_PARAM fields...
+2024-10-07 15:34:34,055 - INFO - Ingesting URB_PARAM into the geo_em file...
+2024-10-07 15:34:34,138 - INFO - Modified geo_em file saved to 00test/geo_em_valencia_test1_modified.nc
+2024-10-07 15:34:34,138 - INFO - Process completed successfully.
+2024-10-07 15:36:25,441 - INFO - Checking the geo_em file for required fields...
+2024-10-07 15:36:25,532 - INFO - All required fields are present in the geo_em file.
+2024-10-07 15:36:42,684 - INFO - File downloaded and extracted: https://github.com/jacobogabeiraspenas/UrbanData01/raw/main/data/01_URB_PARAM/zoom_4/04_07_zoom4_URB_PARAM_100m.zip
+2024-10-07 15:37:18,244 - INFO - File downloaded and extracted: https://github.com/jacobogabeiraspenas/UrbanData01/raw/main/data/01_URB_PARAM/zoom_4/04_08_zoom4_URB_PARAM_100m.zip
+2024-10-07 15:37:18,277 - WARNING - CPLE_AppDefined in PROJ: internal_proj_create_from_database: /Users/gabeiras3j/opt/anaconda3/envs/repre/share/proj/proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 3 is expected. It comes from another PROJ installation.
+2024-10-07 15:37:18,323 - WARNING - CPLE_AppDefined in PROJ: internal_proj_create_from_database: /Users/gabeiras3j/opt/anaconda3/envs/repre/share/proj/proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 3 is expected. It comes from another PROJ installation.
+2024-10-07 15:37:18,882 - WARNING - CPLE_AppDefined:PROJ: internal_proj_create_from_database: /Users/gabeiras3j/opt/anaconda3/envs/repre/share/proj/proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 3 is expected. It comes from another PROJ installation.
+2024-10-07 15:37:29,559 - WARNING - CPLE_AppDefined:PROJ: internal_proj_create_from_database: /Users/gabeiras3j/opt/anaconda3/envs/repre/share/proj/proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 3 is expected. It comes from another PROJ installation.
+2024-10-07 15:37:41,834 - INFO - GDAL signalled an error: err_no=1, msg='PROJ: internal_proj_create_from_name: /Users/gabeiras3j/opt/anaconda3/envs/repre/share/proj/proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 3 is expected. It comes from another PROJ installation.'
+2024-10-07 15:37:47,215 - INFO - Compressed merged file saved at ./temp/URB_PARAM/merged_tiles.tif
+2024-10-07 15:37:47,261 - INFO - Calculating URB_PARAM fields...
+2024-10-07 15:37:50,775 - INFO - Ingesting URB_PARAM into the geo_em file...
+2024-10-07 15:37:50,848 - INFO - Modified geo_em file saved to 00test/geo_em_valencia_test1_modified.nc
+2024-10-07 15:37:50,848 - INFO - Process completed successfully.
+2024-10-07 15:52:27,032 - INFO - Checking the geo_em file for required fields...
+2024-10-07 15:52:27,179 - INFO - All required fields are present in the geo_em file.
+2024-10-07 15:52:43,993 - INFO - File downloaded and extracted: https://github.com/jacobogabeiraspenas/UrbanData01/raw/main/data/01_URB_PARAM/zoom_4/04_07_zoom4_URB_PARAM_100m.zip
+2024-10-07 15:52:43,993 - INFO - Only one tile downloaded. No merging required.
+2024-10-07 15:52:43,993 - INFO - Calculating URB_PARAM fields...
+2024-10-07 15:52:44,645 - INFO - Ingesting URB_PARAM into the geo_em file...
+2024-10-07 15:52:44,702 - INFO - Modified geo_em file saved to 00test/geo_em_test_madrid_modified.nc
+2024-10-07 15:52:44,702 - INFO - Process completed successfully.
+2024-10-07 15:55:03,951 - INFO - Checking the geo_em file for required fields...
+2024-10-07 15:55:04,117 - INFO - All required fields are present in the geo_em file.
+2024-10-07 15:55:40,554 - INFO - File downloaded and extracted: https://github.com/jacobogabeiraspenas/UrbanData01/raw/main/data/01_URB_PARAM/zoom_4/04_08_zoom4_URB_PARAM_100m.zip
+2024-10-07 15:55:55,492 - INFO - File downloaded and extracted: https://github.com/jacobogabeiraspenas/UrbanData01/raw/main/data/01_URB_PARAM/zoom_4/04_07_zoom4_URB_PARAM_100m.zip
+2024-10-07 15:55:55,556 - WARNING - CPLE_AppDefined in PROJ: internal_proj_create_from_database: /Users/gabeiras3j/opt/anaconda3/envs/repre/share/proj/proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 3 is expected. It comes from another PROJ installation.
+2024-10-07 15:55:55,603 - WARNING - CPLE_AppDefined in PROJ: internal_proj_create_from_database: /Users/gabeiras3j/opt/anaconda3/envs/repre/share/proj/proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 3 is expected. It comes from another PROJ installation.
+2024-10-07 15:55:56,234 - WARNING - CPLE_AppDefined:PROJ: internal_proj_create_from_database: /Users/gabeiras3j/opt/anaconda3/envs/repre/share/proj/proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 3 is expected. It comes from another PROJ installation.
+2024-10-07 15:56:08,562 - WARNING - CPLE_AppDefined:PROJ: internal_proj_create_from_database: /Users/gabeiras3j/opt/anaconda3/envs/repre/share/proj/proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 3 is expected. It comes from another PROJ installation.
+2024-10-07 15:56:18,819 - INFO - GDAL signalled an error: err_no=1, msg='PROJ: internal_proj_create_from_name: /Users/gabeiras3j/opt/anaconda3/envs/repre/share/proj/proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 3 is expected. It comes from another PROJ installation.'
+2024-10-07 15:56:24,318 - INFO - Compressed merged file saved at ./temp/URB_PARAM/merged_tiles.tif
+2024-10-07 15:56:24,361 - INFO - Calculating URB_PARAM fields...
+2024-10-07 15:56:32,995 - INFO - Ingesting URB_PARAM into the geo_em file...
+2024-10-07 15:56:33,066 - INFO - Modified geo_em file saved to 00test/geo_em_valencia_test1_modified.nc
+2024-10-07 15:56:33,066 - INFO - Process completed successfully.
+2024-10-07 16:10:52,984 - INFO - Checking the geo_em file for required fields...
+2024-10-07 16:10:53,136 - INFO - All required fields are present in the geo_em file.
+2024-10-07 16:11:06,612 - INFO - File downloaded and extracted: https://github.com/jacobogabeiraspenas/UrbanData01/raw/main/data/01_URB_PARAM/zoom_4/04_07_zoom4_URB_PARAM_100m.zip
+2024-10-07 16:11:06,613 - INFO - Only one tile downloaded. No merging required.
+2024-10-07 16:11:06,613 - INFO - Calculating URB_PARAM fields...
+2024-10-07 16:11:07,268 - INFO - Ingesting URB_PARAM into the geo_em file...
+2024-10-07 16:11:07,362 - INFO - Modified geo_em file saved to 00test/geo_em_test_madrid_modified.nc
+2024-10-07 16:11:07,362 - INFO - Process completed successfully.
+2024-10-07 16:19:15,455 - INFO - Checking the geo_em file for required fields...
+2024-10-07 16:19:15,626 - INFO - All required fields are present in the geo_em file.
+2024-10-07 16:19:58,563 - INFO - File downloaded and extracted: https://github.com/jacobogabeiraspenas/UrbanData01/raw/main/data/01_URB_PARAM/zoom_4/04_07_zoom4_URB_PARAM_100m.zip
+2024-10-07 16:19:58,564 - INFO - Only one tile downloaded. No merging required.
+2024-10-07 16:19:58,564 - INFO - Calculating URB_PARAM fields...
+2024-10-07 16:19:59,226 - INFO - Ingesting URB_PARAM into the geo_em file...
+2024-10-07 16:19:59,288 - INFO - Modified geo_em file saved to 00test/geo_em_test_madrid_modified.nc
+2024-10-07 16:19:59,288 - INFO - Process completed successfully.
+2024-10-07 16:30:29,047 - INFO - Checking the geo_em file for required fields...
+2024-10-07 16:30:29,200 - INFO - All required fields are present in the geo_em file.
+2024-10-07 16:30:47,041 - INFO - File downloaded and extracted: https://github.com/jacobogabeiraspenas/UrbanData01/raw/main/data/01_URB_PARAM/zoom_4/04_07_zoom4_URB_PARAM_100m.zip
+2024-10-07 16:30:47,042 - INFO - Only one tile downloaded. No merging required.
+2024-10-07 16:30:47,042 - INFO - Calculating URB_PARAM fields...
+2024-10-07 16:31:12,579 - INFO - Checking the geo_em file for required fields...
+2024-10-07 16:31:12,725 - INFO - All required fields are present in the geo_em file.
+2024-10-07 16:31:48,494 - INFO - File downloaded and extracted: https://github.com/jacobogabeiraspenas/UrbanData01/raw/main/data/01_URB_PARAM/zoom_4/04_07_zoom4_URB_PARAM_100m.zip
+2024-10-07 16:31:48,495 - INFO - Only one tile downloaded. No merging required.
+2024-10-07 16:31:48,495 - INFO - Calculating URB_PARAM fields...
+2024-10-07 16:32:10,011 - INFO - Checking the geo_em file for required fields...
+2024-10-07 16:32:10,164 - INFO - All required fields are present in the geo_em file.
+2024-10-07 16:32:27,110 - INFO - File downloaded and extracted: https://github.com/jacobogabeiraspenas/UrbanData01/raw/main/data/01_URB_PARAM/zoom_4/04_07_zoom4_URB_PARAM_100m.zip
+2024-10-07 16:32:27,110 - INFO - Only one tile downloaded. No merging required.
+2024-10-07 16:32:27,110 - INFO - Calculating URB_PARAM fields...
+2024-10-07 16:32:27,773 - INFO - Ingesting URB_PARAM into the geo_em file...
+2024-10-07 16:32:27,833 - INFO - Modified geo_em file saved to 00test/geo_em_test_madrid_modified.nc
+2024-10-07 16:32:27,833 - INFO - Process completed successfully.
+2024-10-07 16:33:18,254 - INFO - Checking the geo_em file for required fields...
+2024-10-07 16:33:18,418 - INFO - All required fields are present in the geo_em file.
+2024-10-07 16:33:51,534 - INFO - File downloaded and extracted: https://github.com/jacobogabeiraspenas/UrbanData01/raw/main/data/01_URB_PARAM/zoom_4/04_07_zoom4_URB_PARAM_100m.zip
+2024-10-07 16:33:51,535 - INFO - Only one tile downloaded. No merging required.
+2024-10-07 16:33:51,535 - INFO - Calculating URB_PARAM fields...
+2024-10-07 16:33:52,249 - INFO - Ingesting URB_PARAM into the geo_em file...
+2024-10-07 16:33:52,308 - INFO - Modified geo_em file saved to 00test/geo_em_test_madrid_modified.nc
+2024-10-07 16:33:52,308 - INFO - Process completed successfully.
+2024-10-07 17:00:44,598 - INFO - Checking the geo_em file for required fields...
+2024-10-07 17:00:44,739 - INFO - All required fields are present in the geo_em file.
+2024-10-07 17:02:49,004 - INFO - File downloaded and extracted: https://github.com/jacobogabeiraspenas/UrbanData01/raw/main/data/01_URB_PARAM/zoom_4/04_07_zoom4_URB_PARAM_100m.zip
+2024-10-07 17:02:49,005 - INFO - Only one tile downloaded. No merging required.
+2024-10-07 17:02:49,005 - INFO - Calculating URB_PARAM fields...
+2024-10-07 17:02:49,738 - INFO - Ingesting URB_PARAM into the geo_em file...
+2024-10-07 17:02:49,797 - INFO - Modified geo_em file saved to 00test/geo_em_test_madrid_modified.nc
+2024-10-07 17:02:49,797 - INFO - Process completed successfully.
+2024-10-07 17:09:50,656 - INFO - Checking the geo_em file for required fields...
+2024-10-07 17:09:50,835 - INFO - All required fields are present in the geo_em file.
+2024-10-07 17:10:07,183 - INFO - File downloaded and extracted: https://github.com/jacobogabeiraspenas/UrbanData01/raw/main/data/01_URB_PARAM/zoom_4/04_07_zoom4_URB_PARAM_100m.zip
+2024-10-07 17:10:07,184 - INFO - Only one tile downloaded. No merging required.
+2024-10-07 17:10:07,184 - INFO - Calculating URB_PARAM fields...
+2024-10-07 17:13:10,859 - INFO - Checking the geo_em file for required fields...
+2024-10-07 17:13:11,019 - INFO - All required fields are present in the geo_em file.
+2024-10-07 17:13:38,635 - INFO - File downloaded and extracted: https://github.com/jacobogabeiraspenas/UrbanData01/raw/main/data/01_URB_PARAM/zoom_4/04_07_zoom4_URB_PARAM_100m.zip
+2024-10-07 17:13:38,636 - INFO - Only one tile downloaded. No merging required.
+2024-10-07 17:13:38,636 - INFO - Calculating URB_PARAM fields...
+2024-10-07 17:13:49,689 - INFO - Checking the geo_em file for required fields...
+2024-10-07 17:13:49,864 - INFO - All required fields are present in the geo_em file.
+2024-10-07 17:14:02,961 - INFO - File downloaded and extracted: https://github.com/jacobogabeiraspenas/UrbanData01/raw/main/data/01_URB_PARAM/zoom_4/04_07_zoom4_URB_PARAM_100m.zip
+2024-10-07 17:14:02,963 - INFO - Only one tile downloaded. No merging required.
+2024-10-07 17:14:02,963 - INFO - Calculating URB_PARAM fields...
+2024-10-07 17:14:03,626 - INFO - Ingesting URB_PARAM into the geo_em file...
+2024-10-07 17:14:03,688 - INFO - Modified geo_em file saved to 00test/geo_em_test_madrid_modified.nc
+2024-10-07 17:14:03,688 - INFO - Process completed successfully.
+2024-10-07 17:17:38,833 - INFO - Checking the geo_em file for required fields...
+2024-10-07 17:17:39,008 - INFO - All required fields are present in the geo_em file.
+2024-10-07 17:17:47,505 - INFO - File downloaded and extracted: https://github.com/jacobogabeiraspenas/UrbanData01/raw/main/data/01_URB_PARAM/zoom_4/04_07_zoom4_URB_PARAM_100m.zip
+2024-10-07 17:17:47,507 - INFO - Only one tile downloaded. No merging required.
+2024-10-07 17:17:47,507 - INFO - Calculating URB_PARAM fields...
+2024-10-07 17:17:48,187 - INFO - Ingesting URB_PARAM into the geo_em file...
+2024-10-07 17:17:48,248 - INFO - Modified geo_em file saved to 00test/geo_em_test_madrid_modified.nc
+2024-10-07 17:17:48,248 - INFO - Process completed successfully.
+2024-10-07 17:35:12,018 - INFO - Checking the geo_em file for required fields...
+2024-10-07 17:35:12,205 - INFO - All required fields are present in the geo_em file.
+2024-10-07 17:36:00,787 - INFO - File downloaded and extracted: https://github.com/jacobogabeiraspenas/UrbanData01/raw/main/data/01_URB_PARAM/zoom_4/04_08_zoom4_URB_PARAM_100m.zip
+2024-10-07 17:36:00,790 - INFO - Only one tile downloaded. No merging required.
+2024-10-07 17:36:45,900 - INFO - Modified geo_em file saved to 00test/200_geo_em_LIDAR_noveg_modified.nc
+2024-10-07 17:36:45,900 - INFO - Process completed successfully.
+2024-10-07 17:45:58,515 - INFO - Checking the geo_em file for required fields...
+2024-10-07 17:45:58,667 - INFO - All required fields are present in the geo_em file.
+2024-10-07 17:46:43,733 - INFO - File downloaded and extracted: https://github.com/jacobogabeiraspenas/UrbanData01/raw/main/data/01_URB_PARAM/zoom_4/04_08_zoom4_URB_PARAM_100m.zip
+2024-10-07 17:46:43,734 - INFO - Only one tile downloaded. No merging required.
+2024-10-07 17:47:28,659 - INFO - Modified geo_em file saved to 00test/200_geo_em_LIDAR_noveg_modified.nc
+2024-10-07 17:47:28,660 - INFO - Process completed successfully.
+2024-10-07 17:49:30,142 - INFO - Checking the geo_em file for required fields...
+2024-10-07 17:49:30,324 - INFO - All required fields are present in the geo_em file.
+2024-10-07 17:49:44,008 - INFO - File downloaded and extracted: https://github.com/jacobogabeiraspenas/UrbanData01/raw/main/data/01_URB_PARAM/zoom_4/04_07_zoom4_URB_PARAM_100m.zip
+2024-10-07 17:49:44,008 - INFO - Only one tile downloaded. No merging required.
+2024-10-07 17:49:44,844 - INFO - Modified geo_em file saved to 00test/geo_em_test_madrid_modified.nc
+2024-10-07 17:49:44,844 - INFO - Process completed successfully.
+2024-10-07 17:50:19,001 - INFO - Checking the geo_em file for required fields...
+2024-10-07 17:50:19,196 - INFO - All required fields are present in the geo_em file.
+2024-10-07 17:50:31,925 - INFO - File downloaded and extracted: https://github.com/jacobogabeiraspenas/UrbanData01/raw/main/data/01_URB_PARAM/zoom_4/04_07_zoom4_URB_PARAM_100m.zip
+2024-10-07 17:50:31,926 - INFO - Only one tile downloaded. No merging required.
+2024-10-07 17:50:32,618 - INFO - Modified geo_em file saved to 00test/geo_em_test_madrid_modified.nc
+2024-10-07 17:50:32,618 - INFO - Process completed successfully.
+2024-10-07 17:50:54,851 - INFO - Checking the geo_em file for required fields...
+2024-10-07 17:50:55,029 - INFO - All required fields are present in the geo_em file.
+2024-10-07 17:51:07,948 - INFO - File downloaded and extracted: https://github.com/jacobogabeiraspenas/UrbanData01/raw/main/data/01_URB_PARAM/zoom_4/04_07_zoom4_URB_PARAM_100m.zip
+2024-10-07 17:51:07,949 - INFO - Only one tile downloaded. No merging required.
+2024-10-07 17:51:08,712 - INFO - Modified geo_em file saved to 00test/geo_em_test_madrid_modified.nc
+2024-10-07 17:51:08,712 - INFO - Process completed successfully.
+2024-10-07 17:51:24,857 - INFO - Checking the geo_em file for required fields...
+2024-10-07 17:51:25,028 - INFO - All required fields are present in the geo_em file.
+2024-10-07 17:52:09,627 - INFO - File downloaded and extracted: https://github.com/jacobogabeiraspenas/UrbanData01/raw/main/data/01_URB_PARAM/zoom_4/04_08_zoom4_URB_PARAM_100m.zip
+2024-10-07 17:52:21,210 - INFO - File downloaded and extracted: https://github.com/jacobogabeiraspenas/UrbanData01/raw/main/data/01_URB_PARAM/zoom_4/04_07_zoom4_URB_PARAM_100m.zip
+2024-10-07 17:52:21,247 - WARNING - CPLE_AppDefined in PROJ: internal_proj_create_from_database: /Users/gabeiras3j/opt/anaconda3/envs/repre/share/proj/proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 3 is expected. It comes from another PROJ installation.
+2024-10-07 17:52:21,292 - WARNING - CPLE_AppDefined in PROJ: internal_proj_create_from_database: /Users/gabeiras3j/opt/anaconda3/envs/repre/share/proj/proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 3 is expected. It comes from another PROJ installation.
+2024-10-07 17:52:21,920 - WARNING - CPLE_AppDefined:PROJ: internal_proj_create_from_database: /Users/gabeiras3j/opt/anaconda3/envs/repre/share/proj/proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 3 is expected. It comes from another PROJ installation.
+2024-10-07 17:52:33,697 - WARNING - CPLE_AppDefined:PROJ: internal_proj_create_from_database: /Users/gabeiras3j/opt/anaconda3/envs/repre/share/proj/proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 3 is expected. It comes from another PROJ installation.
+2024-10-07 17:52:44,566 - INFO - GDAL signalled an error: err_no=1, msg='PROJ: internal_proj_create_from_name: /Users/gabeiras3j/opt/anaconda3/envs/repre/share/proj/proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 3 is expected. It comes from another PROJ installation.'
+2024-10-07 17:52:49,981 - INFO - Compressed merged file saved at ./temp/URB_PARAM/merged_tiles.tif
+2024-10-07 17:52:59,185 - INFO - Modified geo_em file saved to 00test/geo_em_valencia_test1_modified.nc
+2024-10-07 17:52:59,185 - INFO - Process completed successfully.
+2024-10-07 17:58:44,683 - INFO - Checking the geo_em file for required fields...
+2024-10-07 17:58:44,961 - INFO - All required fields are present in the geo_em file.
+2024-10-07 17:59:50,011 - INFO - File downloaded and extracted: https://github.com/jacobogabeiraspenas/UrbanData01/raw/main/data/01_URB_PARAM/zoom_4/04_08_zoom4_URB_PARAM_100m.zip
+2024-10-07 17:59:50,015 - INFO - Only one tile downloaded. No merging required.
+2024-10-07 18:01:17,746 - INFO - Modified geo_em file saved to 00test/200_geo_em_LIDAR_noveg_modified.nc
+2024-10-07 18:01:17,747 - INFO - Process completed successfully.
+2024-10-07 18:05:15,070 - INFO - Checking the geo_em file for required fields...
+2024-10-07 18:05:15,287 - INFO - All required fields are present in the geo_em file.
+2024-10-07 18:05:56,020 - INFO - File downloaded and extracted: https://github.com/jacobogabeiraspenas/UrbanData01/raw/main/data/01_URB_PARAM/zoom_4/04_08_zoom4_URB_PARAM_100m.zip
+2024-10-07 18:06:07,691 - INFO - File downloaded and extracted: https://github.com/jacobogabeiraspenas/UrbanData01/raw/main/data/01_URB_PARAM/zoom_4/04_07_zoom4_URB_PARAM_100m.zip
+2024-10-07 18:06:07,765 - WARNING - CPLE_AppDefined in PROJ: internal_proj_create_from_database: /Users/gabeiras3j/opt/anaconda3/envs/repre/share/proj/proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 3 is expected. It comes from another PROJ installation.
+2024-10-07 18:06:07,813 - WARNING - CPLE_AppDefined in PROJ: internal_proj_create_from_database: /Users/gabeiras3j/opt/anaconda3/envs/repre/share/proj/proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 3 is expected. It comes from another PROJ installation.
+2024-10-07 18:06:08,457 - WARNING - CPLE_AppDefined:PROJ: internal_proj_create_from_database: /Users/gabeiras3j/opt/anaconda3/envs/repre/share/proj/proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 3 is expected. It comes from another PROJ installation.
+2024-10-07 18:06:21,859 - WARNING - CPLE_AppDefined:PROJ: internal_proj_create_from_database: /Users/gabeiras3j/opt/anaconda3/envs/repre/share/proj/proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 3 is expected. It comes from another PROJ installation.
+2024-10-07 18:06:33,081 - INFO - GDAL signalled an error: err_no=1, msg='PROJ: internal_proj_create_from_name: /Users/gabeiras3j/opt/anaconda3/envs/repre/share/proj/proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 3 is expected. It comes from another PROJ installation.'
+2024-10-07 18:06:38,556 - INFO - Compressed merged file saved at ./temp/URB_PARAM/merged_tiles.tif
+2024-10-07 18:06:53,095 - INFO - Modified geo_em file saved to 00test/geo_em_valencia_test1_modified.nc
+2024-10-07 18:06:53,095 - INFO - Process completed successfully.
+2024-10-07 18:11:16,493 - INFO - Checking the geo_em file for required fields...
+2024-10-07 18:11:16,631 - INFO - All required fields are present in the geo_em file.
+2024-10-07 18:11:29,182 - INFO - File downloaded and extracted: https://github.com/jacobogabeiraspenas/UrbanData01/raw/main/data/01_URB_PARAM/zoom_4/04_07_zoom4_URB_PARAM_100m.zip
+2024-10-07 18:11:29,182 - INFO - Only one tile downloaded. No merging required.
+2024-10-07 18:11:29,875 - INFO - Modified geo_em file saved to 00test/geo_em_test_madrid_URB_PARAM.nc
+2024-10-07 18:11:29,875 - INFO - Process completed successfully.
+2024-10-07 18:12:12,822 - INFO - Checking the geo_em file for required fields...
+2024-10-07 18:12:12,966 - INFO - All required fields are present in the geo_em file.
+2024-10-07 18:12:22,839 - INFO - File downloaded and extracted: https://github.com/jacobogabeiraspenas/UrbanData01/raw/main/data/00_UrbanFraction/zoom_4_complete/04_07_zoom4_urban_fraction_100m_int8.zip
+2024-10-07 18:12:22,840 - INFO - Only one tile downloaded. No merging required.
+2024-10-07 18:12:22,977 - INFO - Modified geo_em file saved to 00test/geo_em_test_madrid_URB_PARAM_FRC_URB2D.nc
+2024-10-07 18:12:22,977 - INFO - Process completed successfully.

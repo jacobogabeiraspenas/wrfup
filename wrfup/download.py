@@ -5,11 +5,7 @@ import zipfile
 import io
 import logging
 import rasterio
-from rasterio.merge import merge
 from tqdm.auto import tqdm
-
-import rasterio
-from rasterio.enums import Compression
 from rasterio.merge import merge
 
 def merge_tiles(tile_paths, output_path):
@@ -78,10 +74,10 @@ def download_tiles(tile_names, save_dir, download_url):
         return
 
     # Use tqdm to display the progress of the download
-    for tile_name in tqdm(tile_names, desc="Downloading tiles"):
+    for file_num, tile_name in enumerate(tile_names):
         file_name = f"{tile_name}.zip"
         zip_file_url = f"{download_url}/{file_name}"
-        download_and_extract_zip(zip_file_url, save_dir)
+        download_and_extract_zip(zip_file_url, save_dir, file_num + 1, len(tile_names))
         tile_paths.append(os.path.join(save_dir, f"{tile_name}.tif"))
 
     # If multiple tiles were downloaded, merge them
@@ -151,7 +147,7 @@ def get_tile_names_in_aoi(lat_min, lat_max, lon_min, lon_max, field):
 
 
 
-def download_and_extract_zip(zip_url, extraction_path):
+def download_and_extract_zip(zip_url, extraction_path, file_num, total_files):
     """Download and extract a zip file from a URL with real-time progress tracking."""
     response = requests.get(zip_url, stream=True)
     
@@ -161,7 +157,7 @@ def download_and_extract_zip(zip_url, extraction_path):
         block_size = 1024  # 1 Kilobyte chunks
 
         # Create a progress bar using tqdm
-        progress_bar = tqdm(total=total_size_in_bytes, unit='iB', unit_scale=True, desc=f"Downloading {zip_url}")
+        progress_bar = tqdm(total=total_size_in_bytes, unit='iB', unit_scale=True, desc=f"Downloading file {file_num} of {total_files}")
 
         # Create a buffer to store the downloaded file
         buffer = io.BytesIO()
@@ -215,30 +211,30 @@ def get_total_download_size(tile_names, download_url):
     
     return total_size, unknown_size
 
-def download_and_extract_zip(zip_url, extraction_path):
-    """Download and extract a zip file from a URL with real-time progress tracking."""
-    response = requests.get(zip_url, stream=True)
+# def download_and_extract_zip(zip_url, extraction_path):
+#     """Download and extract a zip file from a URL with real-time progress tracking."""
+#     response = requests.get(zip_url, stream=True)
     
-    if response.status_code == 200:
-        total_size_in_bytes = int(response.headers.get('content-length', 0))
-        block_size = 1024  # 1 Kilobyte chunks
+#     if response.status_code == 200:
+#         total_size_in_bytes = int(response.headers.get('content-length', 0))
+#         block_size = 1024  # 1 Kilobyte chunks
 
-        # Create a progress bar using tqdm
-        progress_bar = tqdm(total=total_size_in_bytes, unit='iB', unit_scale=True, desc=f"Downloading {zip_url}")
+#         # Create a progress bar using tqdm
+#         progress_bar = tqdm(total=total_size_in_bytes, unit='iB', unit_scale=True, desc=f"Downloading {zip_url}")
 
-        buffer = io.BytesIO()
+#         buffer = io.BytesIO()
 
-        for data in response.iter_content(block_size):
-            progress_bar.update(len(data))
-            buffer.write(data)
+#         for data in response.iter_content(block_size):
+#             progress_bar.update(len(data))
+#             buffer.write(data)
 
-        progress_bar.close()
+#         progress_bar.close()
 
-        # Extract the downloaded zip file
-        buffer.seek(0)  # Reset buffer position to the start
-        with zipfile.ZipFile(buffer) as thezip:
-            thezip.extractall(extraction_path)
-        logging.info(f"File downloaded and extracted: {zip_url}")
-    else:
-        logging.error(f"Failed to download the file: {zip_url}")
+#         # Extract the downloaded zip file
+#         buffer.seek(0)  # Reset buffer position to the start
+#         with zipfile.ZipFile(buffer) as thezip:
+#             thezip.extractall(extraction_path)
+#         logging.info(f"File downloaded and extracted: {zip_url}")
+#     else:
+#         logging.error(f"Failed to download the file: {zip_url}")
 

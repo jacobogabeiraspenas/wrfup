@@ -1,4 +1,4 @@
-# main.py in wrfup
+# wrfup/main.py
 import argparse
 import logging
 import os
@@ -6,7 +6,7 @@ from wrfup.info import Info
 from wrfup.download import download_tiles, get_tile_names_in_aoi
 from wrfup.ingest import ingest_fields
 from wrfup.utils import clean_up, check_geo_em_file, get_lat_lon_extent
-from wrfup.calculation import calculate_frc_urb2d
+from wrfup.calculation import calculate_frc_urb2d, calculate_urb_param
 
 # Configure logging
 logging.basicConfig(
@@ -64,7 +64,6 @@ def main(argv=None):
     # Step 4: Get tile names based on geo_em file’s extent
     tile_names = get_tile_names_in_aoi(lat_min, lat_max, lon_min, lon_max, info.field)
 
-
     # Step 5: Download the necessary tiles based on field
     if info.field == 'FRC_URB2D':
         download_tiles(tile_names, field_dir, FRC_URB2D_URL)
@@ -72,19 +71,19 @@ def main(argv=None):
         download_tiles(tile_names, field_dir, URB_PARAM_URL)
 
     # Step 6: Perform calculations to prepare data for ingestion
+    merged_tiff_path = os.path.join(field_dir, 'merged_tiles.tif')
     if info.field == 'FRC_URB2D':
-        merged_tiff_path = os.path.join(field_dir, 'merged_tiles.tif')
-        logging.info("Calculating FRC_URB2D field...")
+        # logging.info("Calculating FRC_URB2D field...")
         ds = calculate_frc_urb2d(info, ds, merged_tiff_path)
+    elif info.field == 'URB_PARAM':
+        # logging.info("Calculating URB_PARAM fields...")
+        ds = calculate_urb_param(info, ds, merged_tiff_path)
 
-    # Step 7: Ingest fields into the geo_em file
-    logging.info(f"Ingesting {info.field} into the geo_em file...")
-
-    # Write to a temporary file first
-    output_geo_em_path = geo_em_path.replace('.nc', '_modified.nc')
+    # Step 7: Write the modified dataset to a new file
+    output_geo_em_path = geo_em_path.replace('.nc', f'_{info.field}.nc')
+    # logging.info(f"Ingesting {info.field} into the geo_em file...")
     ds.to_netcdf(output_geo_em_path)
     logging.info(f"Modified geo_em file saved to {output_geo_em_path}")
-
 
     # # Step 8: Clean up temporary files
     # logging.info("Cleaning up temporary files...")

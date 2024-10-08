@@ -1,0 +1,29 @@
+# .readthedocs.yaml
+# This is a configuration file for the Read the Docs documentation builder.
+# It defines the build behavior for your project.
+
+version: 2
+
+# Build documentation inside a conda environment
+conda:
+  environment: docs/environment.yml
+
+# Build documentation using Sphinx
+sphinx:
+  configuration: docs/conf.py
+
+# Define the Python version to use for the build
+python:
+  version: 3.9
+  install:
+    - method: pip
+      path: .
+
+# Install additional dependencies required for the documentation
+requirements:
+  - docs/requirements.txt
+
+# The list of files/directories to include in the documentation
+exclude:
+  - .venv
+  - docs/build

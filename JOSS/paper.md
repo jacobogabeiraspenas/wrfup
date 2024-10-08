@@ -1,4 +1,6 @@
-# wrfup: A Python Package to Enhance Urban Climate Modeling in WRF
+# wrfup: WRF Urban Parameters Toolkit
+### A Python Tool for Ingesting Urban Morphology Data into WRF Simulations
+
 
 **Author:**  
 Jacobo Gabeiras  
@@ -6,7 +8,7 @@ Univ. Grenoble Alpes, CNRS, Grenoble INP, LEGI, Grenoble, 38000, France
 *Email:* Jacobo.Gabeiras-Penas@univ-grenoble-alpes.fr  
 
 
-## Abstract
+### Summary
 
 wrfup is a Python-based tool designed to improve urban climate modeling in the Weather Research and Forecasting (WRF) model. By dynamically calculating key urban canopy parameters, wrfup enhances the precision of urban weather simulations. The package facilitates ingestion of high-resolution urban morphology data directly into WRF’s geo_em files, including crucial fields like **URB_PARAM** and **FRC_URB2D**. These parameters are vital for advanced urban modeling schemes such as SLUCM, BEP, and BEP+BEM. wrfup simplifies the workflow, offering an accessible and efficient method for preparing urban data for WRF simulations via terminal commands.  
 
@@ -17,17 +19,13 @@ Accurately simulating urban climate and weather phenomena, such as the **urban h
 
 One major challenge lies in obtaining detailed, city-specific urban data. High-resolution datasets like **LiDAR** provide accurate urban morphology data but are often difficult to process, complex to integrate into models, and not universally available, especially in developing cities. The **WUDAPT (World Urban Database and Access Portal Tools)** [@EUWUDAPT] project addresses this gap by offering the **Local Climate Zone (LCZ)** framework, which generalizes urban areas into distinct zones based on physical characteristics. The **LCZ Generator** [@lczgenerator] and **W2W (WUDAPT to WRF)** [@w2w] further enhance and facilitate the integration process of LCZ data into the WRF model. However, this approach relies on generalized table values rather than specific, detailed urban structure data, which limits the accuracy of the simulations.
 
-**wrfup** offers a more tailored solution by allowing users to ingest real-world urban data directly into WRF’s **geo_em** files. Unlike the LiDAR approach, which can be time-consuming and difficult to handle, wrfup provides a much faster workflow—achievable within minutes—and offers a higher level of accuracy compared to WUDAPT’s generalized approach. By dynamically calculating critical urban morphological parameters, wrfup supports advanced urban parameterizations like SLUCM, BEP, and BEP+BEM, enabling detailed urban canopy simulations that reflect the specific characteristics of each city. Furthermore, wrfup is compatible with W2W, enhancing the capability to simulate urban environments in a way that is both accurate and accessible.
+**wrfup** provides an efficient solution for integrating real-world urban data into WRF’s **geo_em** files. Unlike the complex LiDAR approach, which can be difficult and time-consuming, **wrfup** offers a much faster workflow—achievable within minutes—while maintaining a higher level of accuracy compared to generalized data frameworks like WUDAPT. By calculating key urban morphology parameters, **wrfup** supports advanced urban parameterizations (**SLUCM**, **BEP**, and **BEP+BEM**), allowing for detailed simulations that accurately reflect city-specific characteristics. It also complements **W2W**, enhancing its capabilities for simulating urban environments more precisely and effectively.
 
 
-## Software Description
-
-### Functionality
+### Software Description
 
 
 The tool works by calculating and ingesting the fields **URB_PARAM** and **FRC_URB2D**, which contain critical information for representing urban surfaces in the WRF model. **URB_PARAM** is a key field in the WRF urban models, containing information like the **Plan Area Fraction** and **Building Height Distribution**, while **FRC_URB2D** represents the fraction of urban land in each grid cell.
-
-### Code Structure
 
 The **wrfup** package is structured around modules that handle downloading data, calculating necessary fields, and ingesting them into WRF’s **geo_em** files.
 
@@ -36,9 +34,10 @@ The **wrfup** package is structured around modules that handle downloading data,
 - **Calculation Module**: Responsible for calculating urban parameters such as:
     - **Plan Area Fraction (LAMBDA_P)** stored in slice [90,:,:]
     - **Mean Building Height** stored in slice [91,:,:]
+    - **Standard deviation of Building Height** stored in slice [92,:,:]
     - **Weighted Building Height** stored in slice [93,:,:]
     - **Frontal Area Fraction (LAMBDA_B)** stored in slice [94,:,:]
-    - **Frontal Area Index** stored in slices [96-99,:,:] for different wind directions
+    - **Frontal Area Index** stored in slices [95-98,:,:] for different wind directions
     - **Building Height Distribution** stored in slices [117:132,:,:]
 - **Utility Module**: Handles tasks such as cleaning temporary files, verifying geo_em file integrity, and managing the output of modified **geo_em** files.
 
@@ -107,7 +106,7 @@ When using **wrfup** to modify **geo_em** files and integrate urban morphologica
 
 
 
-## References
+### References
 
 - **Marconcini, M., Esch, T., Metz, A., et al.** (2021). *World Settlement Footprint 3D - A first three-dimensional survey of the global building stock*. ResearchGate. Available at: [https://www.researchgate.net/publication/357678737_World_Settlement_Footprint_3D_-_A_first_three-dimensional_survey_of_the_global_building_stock](https://www.researchgate.net/publication/357678737_World_Settlement_Footprint_3D_-_A_first_three-dimensional_survey_of_the_global_building_stock)
 

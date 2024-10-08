@@ -10,8 +10,6 @@ Univ. Grenoble Alpes, CNRS, Grenoble INP, LEGI, Grenoble, 38000, France
 
 wrfup is a Python-based tool designed to improve urban climate modeling in the Weather Research and Forecasting (WRF) model. By dynamically calculating key urban canopy parameters, wrfup enhances the precision of urban weather simulations. The package facilitates ingestion of high-resolution urban morphology data directly into WRF’s geo_em files, including crucial fields like **URB_PARAM** and **FRC_URB2D**. These parameters are vital for advanced urban modeling schemes such as SLUCM, BEP, and BEP+BEM. wrfup simplifies the workflow, offering an accessible and efficient method for preparing urban data for WRF simulations via terminal commands.  
 
-Here’s an updated version that addresses the key points you mentioned, while incorporating the correct order and clarity of ideas:
-
 
 ### Statement of Need
 
@@ -72,7 +70,6 @@ This streamlined approach eliminates the need for manual data handling and compl
 
 Yes, the **Integration in WRF’s Preprocessing** section is a great place to include the workflow that highlights how **wrfup** fits into the WRF model pipeline.
 
-Here’s an updated version of the section including the workflow:
 
 
 ### Integration in WRF’s Preprocessing
@@ -85,8 +82,6 @@ The **wrfup** tool is designed to work seamlessly with the Weather Research and 
 4. The **metgrid** tool integrates the updated **geo_em** file with meteorological data, preparing the input files for the WRF simulation.
 5. Finally, these preprocessed files are used by the **real** and **wrf** executables to run the actual weather or climate simulation, incorporating precise urban morphology data into the model.
 
-Here’s a visual representation of the integration process:
-
 
 
 ![Workflow Diagram](pics/diagram_wps_integration_corrected.png)
@@ -96,7 +91,6 @@ such as Plan Area Fraction, Mean Building Height, and Total Building Area, and m
 with Metgrid and WRF simulations.
 
 
-Here’s a refined version of the **Important Notes** section:
 
 
 ### Important Notes
@@ -115,8 +109,14 @@ When using **wrfup** to modify **geo_em** files and integrate urban morphologica
 
 ## References
 
-- **Marconcini, M., Esch, T., Metz, A., et al.** (2021). *World Settlement Footprint 3D - A first three-dimensional survey of the global building stock*. ResearchGate. [Link](https://www.researchgate.net/publication/357678737_World_Settlement_Footprint_3D_-_A_first_three-dimensional_survey_of_the_global_building_stock)
+- **Marconcini, M., Esch, T., Metz, A., et al.** (2021). *World Settlement Footprint 3D - A first three-dimensional survey of the global building stock*. ResearchGate. Available at: [https://www.researchgate.net/publication/357678737_World_Settlement_Footprint_3D_-_A_first_three-dimensional_survey_of_the_global_building_stock](https://www.researchgate.net/publication/357678737_World_Settlement_Footprint_3D_-_A_first_three-dimensional_survey_of_the_global_building_stock)
 
-- **Pablo d'Entremont, et al.** (2022). *Urban Fraction Data*. Zenodo. [Link](https://zenodo.org/records/6994975)
+- **Pablo d'Entremont et al.** (2022). *Urban Fraction Data*. Zenodo. Available at: [https://zenodo.org/records/6994975](https://zenodo.org/records/6994975)
 
-- **Matthias Demuzere, Daniel Argüeso, Andrea Zonato, Jonas Kittner** (2022). *W2W: A Python package that injects WUDAPT's Local Climate Zone information in WRF*. Journal of Open Source Software, 7(76), 4432. [Link](https://doi.org/10.21105/joss.04432)
+- **Demuzere, M., Argüeso, D., Zonato, A., Kittner, J.** (2022). *W2W: A Python package that injects WUDAPT's Local Climate Zone information in WRF*. Journal of Open Source Software, 7(76), 4432. Available at: [https://doi.org/10.21105/joss.04432](https://doi.org/10.21105/joss.04432)
+
+- **Salamanca, F., Krpo, A., Martilli, A., Clappier, A.** (2010). *A new building energy model coupled with an urban canopy parameterization for urban climate simulations—part I. formulation, verification, and sensitivity analysis of the model*. Theoretical and Applied Climatology, 99(3), 331-344. Available at: [https://doi.org/10.1007/s00704-009-0142-9](https://doi.org/10.1007/s00704-009-0142-9)
+
+- **Demuzere, M., Bechtel, B., Middel, A., Mills, G.** (2019). *Mapping Europe into local climate zones*. PLOS ONE, 14(4), 1-27. Available at: [https://doi.org/10.1371/journal.pone.0214474](https://doi.org/10.1371/journal.pone.0214474)
+
+- **Demuzere, M., Kittner, J., Bechtel, B.** (2021). *LCZ Generator: A Web Application to Create Local Climate Zone Maps*. Frontiers in Environmental Science, 9. Available at: [https://doi.org/10.3389/fenvs.2021.637455](https://doi.org/10.3389/fenvs.2021.637455)

@@ -75,5 +75,4 @@ If you have any questions or suggestions, feel free to open an issue or reach ou
 
 **Jacobo Gabeiras Penas**  
 Email: jacobogabeiras@gmail.com
-```
 

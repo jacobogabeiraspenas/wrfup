@@ -1,0 +1,15 @@
+Metadata-Version: 2.1
+Name: wrfup
+Version: 1.0.0
+License-File: LICENSE
+Requires-Dist: numpy
+Requires-Dist: tqdm
+Requires-Dist: requests
+Requires-Dist: netCDF4
+Requires-Dist: pandas
+Requires-Dist: shapely
+Requires-Dist: fiona
+Requires-Dist: ipyleaflet
+Requires-Dist: ipywidgets
+Requires-Dist: xarray
+Requires-Dist: scipy

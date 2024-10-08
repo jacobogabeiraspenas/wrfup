@@ -1,27 +1,79 @@
-# UrbanSurfAce
+# wrfup (WRF Urban Parameters python package)
 
-## Code Overview
+**wrfup** is a Python package designed to help users ingest real-world, high-resolution urban morphology data into WRF (Weather Research and Forecasting) geo_em files. It provides robust functionalities to **download**, **calculate**, and **ingest** crucial urban fields such as **FRC_URB2D** (Urban Fraction) and **URB_PARAM** (Urban Parameters). These fields are essential for accurate urban weather modeling and are compatible with several WRF urban parameterizations, including **BEP (Building Energy Parameterization)**, **BEP+BEM (Building Energy Model)**, and **SLUCM (Single-Layer Urban Canopy Model)**.
 
-UrbanSurfAce can interactive map that allows users to draw shapes on the map and then download and display OpenStreetMap (OSM) building data within the area defined by the drawn shape. The code operates in the following manner:
+The package allows for the ingestion of data related to urban canopy features, such as building fraction, heights, and urban area coverage, from multiple high-resolution sources (e.g., **World Settlement Footprint 3D**, **Microsoft Buildings**). These detailed datasets significantly improve the representation of urban surfaces in WRF, leading to more precise simulations of urban heat islands, microclimates, and energy exchanges.
 
-1. **Map Initialization**: It initializes an interactive map using the `ipyleaflet` library. Users can specify the initial map center and zoom level.
+## Features
 
-2. **Drawing Rectangles**: The map allows users to draw rectangles using a DrawControl. When a user draws a rectangle on the map, the code captures the coordinates of the drawn rectangle.
+- **Download Urban Data:** Easily download urban fraction and urban parameter tiles for any area of interest.
+- **Calculate Fields:** Compute the necessary fields (e.g., FRC_URB2D, URB_PARAM) for WRF urban simulations.
+- **Ingest Data:** Automatically insert the calculated fields into WRF geo_em files.
+- **Command-line Tool:** Provides a user-friendly CLI to facilitate all operations.
 
-3. **Calculating OSM Tile Range**: It calculates the range of OSM tiles that intersect with the drawn rectangle. It computes the tile numbers based on the drawn area.
+## Installation
 
-4. **Downloading OSM Building Data**: The code downloads OSM building data within the specified tile range. It downloads individual tiles that intersect with the drawn area and stores them in a local directory. Users can choose to display these tiles on the map.
+To install the `wrfup` package, simply use `pip`:
 
-5. **Merging Building Data**: After downloading, it merges the OSM building data from the individual tiles into a single GeoJSON file.
+```bash
+pip install wrfup
+```
 
-6. **Custom Controls**: It provides custom controls on the map. One control allows users to download OSM building data for the drawn area, and another control lets users add the merged building data to the map.
+## Usage
 
-7. **Haversine Factor**: It calculates a haversine factor based on the latitude of the drawn area. This factor is used for distance calculations.
+### Command-Line Interface (CLI)
 
-8. **Adding Geo-EM File Extent**: It can add the extent of a NetCDF file to the map.
+You can use `wrfup` as a command-line tool to work with WRF geo_em files:
 
-The result is an interactive map where users can draw shapes, download OSM building data within the drawn area, and visualize this data on the map. It's a tool for exploring and working with building data in a geographic context.
+```bash
+wrfup geo_em.d0X.nc URB_PARAM --work_dir YOUR_DIRECTORY
+```
 
-The `CustomControl` and `CustomControl2` classes handle the user interactions with the map, allowing users to trigger specific actions like downloading and displaying building data.
+## Modules
 
-![Alt Text](https://github.com/jacobogabeiraspenas/UrbanSurfAce/blob/main/.various/UrbanSurfAce_example.gif?raw=true)
+`wrfup` includes the following modules:
+
+- **`main`**: The entry point for the command-line interface.
+- **`download`**: Functions to download urban data tiles.
+- **`calculation`**: Functions to compute required fields (e.g., FRC_URB2D, URB_PARAM).
+- **`utils`**: Utility functions like file cleanup and validation.
+- **`info`**: Handles configuration and argument parsing.
+
+## Requirements
+
+`wrfup` relies on the following Python packages:
+
+- `numpy`
+- `tqdm`
+- `requests`
+- `netCDF4`
+- `pandas`
+- `shapely`
+- `fiona`
+- `ipyleaflet`
+- `ipywidgets`
+- `xarray`
+- `scipy`
+
+## Development
+
+To set up a development environment for `wrfup`, clone the repository and install the dependencies:
+
+```bash
+git clone https://github.com/jacobogabeiraspenas/UrbanSurfAce.git
+cd UrbanSurfAce
+pip install -r requirements.txt
+```
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
+
+## Contact
+
+If you have any questions or suggestions, feel free to open an issue or reach out to the author:
+
+**Jacobo Gabeiras Penas**  
+Email: jacobogabeiras@gmail.com
+```
+

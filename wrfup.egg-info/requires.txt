@@ -1,0 +1,11 @@
+numpy
+tqdm
+requests
+netCDF4
+pandas
+shapely
+fiona
+ipyleaflet
+ipywidgets
+xarray
+scipy

@@ -618,3 +618,6 @@
 2024-10-08 09:27:00,073 - WARNING - CPLE_AppDefined in PROJ: internal_proj_create_from_database: /Users/gabeiras3j/opt/anaconda3/envs/repre/share/proj/proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 3 is expected. It comes from another PROJ installation.
 2024-10-08 09:28:28,552 - INFO - Modified geo_em file saved to 00test/200_geo_em_LIDAR_noveg_URB_PARAM.nc
 2024-10-08 09:28:28,552 - INFO - Process completed successfully.
+2024-10-08 12:09:53,163 - INFO - Checking the geo_em file for required fields...
+2024-10-08 12:09:53,785 - INFO - All required fields are present in the geo_em file.
+2024-10-08 12:09:57,626 - INFO - Download canceled by the user.

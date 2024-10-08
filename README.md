@@ -50,8 +50,6 @@ wrfup geo_em.d0X.nc URB_PARAM --work_dir YOUR_DIRECTORY
 - `pandas`
 - `shapely`
 - `fiona`
-- `ipyleaflet`
-- `ipywidgets`
 - `xarray`
 - `scipy`
 

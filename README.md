@@ -60,8 +60,8 @@ wrfup geo_em.d0X.nc URB_PARAM --work_dir YOUR_DIRECTORY
 To set up a development environment for `wrfup`, clone the repository and install the dependencies:
 
 ```bash
-git clone https://github.com/jacobogabeiraspenas/UrbanSurfAce.git
-cd UrbanSurfAce
+git clone https://github.com/jacobogabeiraspenas/wrfup.git
+cd wrfup
 pip install -r requirements.txt
 ```
 

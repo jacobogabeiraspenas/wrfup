@@ -80,14 +80,16 @@ def download_tiles(tile_names, save_dir, download_url):
         download_and_extract_zip(zip_file_url, save_dir, file_num + 1, len(tile_names))
         tile_paths.append(os.path.join(save_dir, f"{tile_name}.tif"))
 
+
     # If multiple tiles were downloaded, merge them
     if len(tile_paths) > 1:
         output_path = os.path.join(save_dir, "merged_tiles.tif")
         merge_tiles(tile_paths, output_path)
     else:
         logging.info("Only one tile downloaded. No merging required.")
+        output_path = tile_paths[0]
 
-    return tile_paths
+    return output_path
 
 def lat_lon_to_tile_indices(lat, lon, grid_rows=16, grid_cols=16):
     """

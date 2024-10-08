@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>wrfup.calculation &mdash; wrfup 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=92fd9be5" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=8d563738"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            wrfup
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">wrfup package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">wrfup</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">wrfup.calculation</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for wrfup.calculation</h1><div class="highlight"><pre>
+<span></span><span class="c1"># wrfup/calculation.py</span>
+<span class="kn">import</span> <span class="nn">rasterio</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
+<span class="kn">from</span> <span class="nn">tqdm.auto</span> <span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">from</span> <span class="nn">rasterio.windows</span> <span class="kn">import</span> <span class="n">from_bounds</span>
+
+
+<span class="c1"># wrfup/calculation.py</span>
+<span class="kn">import</span> <span class="nn">rasterio</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
+<span class="kn">from</span> <span class="nn">tqdm.auto</span> <span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">from</span> <span class="nn">rasterio.windows</span> <span class="kn">import</span> <span class="n">from_bounds</span>
+<span class="kn">from</span> <span class="nn">scipy.ndimage</span> <span class="kn">import</span> <span class="n">sobel</span>
+
+<div class="viewcode-block" id="calculate_urb_param">
+<a class="viewcode-back" href="../../modules.html#wrfup.calculation.calculate_urb_param">[docs]</a>
+<span class="k">def</span> <span class="nf">calculate_urb_param</span><span class="p">(</span><span class="n">info</span><span class="p">,</span> <span class="n">geo_em_ds</span><span class="p">,</span> <span class="n">merged_tiff_path</span><span class="p">,</span> <span class="n">field_name</span><span class="o">=</span><span class="s1">&#39;URB_PARAM&#39;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the URB_PARAM field.</span>
+
+<span class="sd">    This calculation follows the **NUDAPT 44** field structure:</span>
+<span class="sd">    </span>
+<span class="sd">    - **LAMBDA_P (Plan Area Fraction)**: </span>
+<span class="sd">      Stored in slice [90,:,:] of `URB_PARAM`. It represents the fraction of the grid cell&#39;s area covered by building footprints.</span>
+
+<span class="sd">    - **Mean Building Height (Geometric Mean)**:</span>
+<span class="sd">      Stored in slice [91,:,:] of `URB_PARAM`. It is the geometric mean of building heights within the grid cell.</span>
+
+<span class="sd">    - **Standard Deviation of Building Heights**:</span>
+<span class="sd">      Stored in slice [92,:,:] of `URB_PARAM`. It calculates the standard deviation of building heights.</span>
+
+<span class="sd">    - **Weighted Building Height**:</span>
+<span class="sd">      Stored in slice [93,:,:] of `URB_PARAM`. It represents the average building height weighted by the planar surface area (LAMBDA_P).</span>
+<span class="sd">    </span>
+<span class="sd">    - **LAMBDA_B (Frontal Area Fraction)**:</span>
+<span class="sd">      Stored in slice [94,:,:] of `URB_PARAM`. It represents the fraction of the grid cell&#39;s frontal area occupied by building walls.</span>
+
+<span class="sd">    - **Frontal Area Index (FAI)**:</span>
+<span class="sd">      - **North**: Stored in slice [96,:,:] of `URB_PARAM`.</span>
+<span class="sd">      - **South**: Stored in slice [97,:,:] of `URB_PARAM`.</span>
+<span class="sd">      - **East**: Stored in slice [98,:,:] of `URB_PARAM`.</span>
+<span class="sd">      - **West**: Stored in slice [99,:,:] of `URB_PARAM`.</span>
+<span class="sd">    </span>
+<span class="sd">    - **Building Height Distribution**:</span>
+<span class="sd">      Stored in slices [117:132,:,:] of `URB_PARAM`.</span>
+<span class="sd">    </span>
+<span class="sd">    The building height distribution is computed using the following bin ranges (in meters):</span>
+<span class="sd">    - 0-5, 5-10, 10-15, ..., up to 70+ meters.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+
+<span class="c1"># def calculate_urb_param(info, geo_em_ds, merged_tiff_path, field_name=&#39;URB_PARAM&#39;):</span>
+<span class="c1">#     &quot;&quot;&quot;</span>
+<span class="c1">#     Calculate the URB_PARAM field by averaging LAMBDA_B, LAMBDA_P, weighted Building Heights,</span>
+<span class="c1">#     geometric mean of building heights, standard deviation of building heights, </span>
+<span class="c1">#     Frontal Area Index (FAI) for four directions (N, S, E, W), </span>
+<span class="c1">#     and computing the building height distribution in 5-meter intervals.</span>
+
+<span class="c1">#     This calculation follows the **NUDAPT 44** (National Urban Database and Access Portal Tool) </span>
+<span class="c1">#     field structure, ensuring compatibility with the urban parameterization in WRF. </span>
+<span class="c1">#     Fields are stored in specific indices of the `URB_PARAM` array:</span>
+
+<span class="c1">#     - **LAMBDA_P (Plan Area Fraction)**: </span>
+<span class="c1">#     Stored in slice [90,:,:] of `URB_PARAM`. It represents the fraction of the grid cell&#39;s area covered by building footprints.</span>
+
+<span class="c1">#     - **Mean Building Height (Geometric Mean)**:</span>
+<span class="c1">#     Stored in slice [91,:,:] of `URB_PARAM`. It is the geometric mean of building heights within the grid cell.</span>
+
+<span class="c1">#     - **Standard Deviation of Building Heights**:</span>
+<span class="c1">#     Stored in slice [92,:,:] of `URB_PARAM`. It calculates the standard deviation of building heights.</span>
+
+<span class="c1">#     - **Weighted Building Height**:</span>
+<span class="c1">#     Stored in slice [93,:,:] of `URB_PARAM`. It represents the average building height weighted by the planar surface area (LAMBDA_P).</span>
+
+<span class="c1">#     - **LAMBDA_B (Frontal Area Fraction)**:</span>
+<span class="c1">#     Stored in slice [94,:,:] of `URB_PARAM`. It represents the fraction of the grid cell&#39;s frontal area occupied by building walls.</span>
+
+<span class="c1">#     - **Frontal Area Index (FAI)** for the four cardinal directions:</span>
+<span class="c1">#     - **North**: Stored in slice [96,:,:] of `URB_PARAM`.</span>
+<span class="c1">#     - **South**: Stored in slice [97,:,:] of `URB_PARAM`.</span>
+<span class="c1">#     - **East**: Stored in slice [98,:,:] of `URB_PARAM`.</span>
+<span class="c1">#     - **West**: Stored in slice [99,:,:] of `URB_PARAM`.</span>
+
+<span class="c1">#     - **Building Height Distribution**:</span>
+<span class="c1">#     Stored in slices [117:132,:,:] of `URB_PARAM`. Each slice represents the percentage of buildings within the grid cell </span>
+<span class="c1">#     that fall within specific height bins (5-meter intervals).</span>
+
+<span class="c1">#     The building height distribution is computed using the following bin ranges (in meters):</span>
+<span class="c1">#     - 0-5, 5-10, 10-15, ..., up to 70+ meters.</span>
+
+<span class="c1">#     Args:</span>
+<span class="c1">#         info (Info): The configuration object containing paths and settings.</span>
+<span class="c1">#         geo_em_ds (xarray.Dataset): The opened geo_em dataset.</span>
+<span class="c1">#         merged_tiff_path (str): Path to the merged GeoTIFF file containing LAMBDA_B, LAMBDA_P, and Building Heights.</span>
+<span class="c1">#         field_name (str): The field name to store the data (default: &#39;URB_PARAM&#39;).</span>
+
+<span class="c1">#     Returns:</span>
+<span class="c1">#         xarray.Dataset: Updated geo_em dataset with calculated URB_PARAM fields.</span>
+<span class="c1">#     &quot;&quot;&quot;</span>
+
+
+    <span class="c1"># Ensure URB_PARAM fields exist in geo_em and are initialized</span>
+    <span class="n">geo_em_ds</span> <span class="o">=</span> <span class="n">add_urb_param_fields_if_not_exists</span><span class="p">(</span><span class="n">geo_em_ds</span><span class="p">)</span>
+
+    <span class="c1"># Open the merged GeoTIFF containing LAMBDA_B, LAMBDA_P, and Building Heights</span>
+    <span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">merged_tiff_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">src</span><span class="p">:</span>
+        <span class="c1"># Define the lat/lon coordinates of the geo_em grid</span>
+        <span class="n">lats_c_geo_em</span> <span class="o">=</span> <span class="n">geo_em_ds</span><span class="p">[</span><span class="s1">&#39;XLAT_C&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>  <span class="c1"># Latitude corners</span>
+        <span class="n">lons_c_geo_em</span> <span class="o">=</span> <span class="n">geo_em_ds</span><span class="p">[</span><span class="s1">&#39;XLONG_C&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>  <span class="c1"># Longitude corners</span>
+
+        <span class="c1"># Initialize arrays to store the URB_PARAM fields</span>
+        <span class="n">lambda_b_grid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">geo_em_ds</span><span class="p">[</span><span class="s1">&#39;XLAT_M&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+        <span class="n">lambda_p_grid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">geo_em_ds</span><span class="p">[</span><span class="s1">&#39;XLAT_M&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+        <span class="n">weighted_building_height_grid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">geo_em_ds</span><span class="p">[</span><span class="s1">&#39;XLAT_M&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+        <span class="n">mean_building_height_grid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">geo_em_ds</span><span class="p">[</span><span class="s1">&#39;XLAT_M&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+        <span class="n">std_building_height_grid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">geo_em_ds</span><span class="p">[</span><span class="s1">&#39;XLAT_M&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+        
+        <span class="c1"># Arrays for Frontal Area Index (FAI) for four directions</span>
+        <span class="n">frontal_area_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">geo_em_ds</span><span class="p">[</span><span class="s1">&#39;XLAT_M&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+
+        <span class="c1"># Define the bin edges and labels for building height distribution</span>
+        <span class="n">bin_edges</span> <span class="o">=</span> <span class="p">[</span><span class="mf">2.5</span><span class="p">,</span> <span class="mf">7.5</span><span class="p">,</span> <span class="mf">12.5</span><span class="p">,</span> <span class="mf">17.5</span><span class="p">,</span> <span class="mf">22.5</span><span class="p">,</span> <span class="mf">27.5</span><span class="p">,</span> <span class="mf">32.5</span><span class="p">,</span> <span class="mf">37.5</span><span class="p">,</span> <span class="mf">42.5</span><span class="p">,</span> <span class="mf">47.5</span><span class="p">,</span> <span class="mf">52.5</span><span class="p">,</span> <span class="mf">57.5</span><span class="p">,</span> <span class="mf">62.5</span><span class="p">,</span> <span class="mf">67.5</span><span class="p">,</span> <span class="mf">72.5</span><span class="p">,</span> <span class="mi">2000</span><span class="p">]</span>
+        <span class="n">bin_labels</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">117</span><span class="p">,</span> <span class="mi">132</span><span class="p">)</span>  <span class="c1"># URB_PARAM slices for height distribution</span>
+
+        
+        <span class="c1"># Loop through each grid cell in geo_em and calculate the averages for LAMBDA_B, LAMBDA_P,</span>
+        <span class="c1"># weighted building heights, mean building heights, standard deviation, FAI, and height distribution</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">lats_c_geo_em</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Calculating URB_PARAM&quot;</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">lons_c_geo_em</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="c1"># Define lat/lon bounds for the current grid cell</span>
+                <span class="n">lat_min</span><span class="p">,</span> <span class="n">lat_max</span> <span class="o">=</span> <span class="n">lats_c_geo_em</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">],</span> <span class="n">lats_c_geo_em</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+                <span class="n">lon_min</span><span class="p">,</span> <span class="n">lon_max</span> <span class="o">=</span> <span class="n">lons_c_geo_em</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">],</span> <span class="n">lons_c_geo_em</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+
+                <span class="c1"># Crop the GeoTIFF based on these lat/lon bounds and return the mosaics</span>
+                <span class="n">lambda_b_mosaic</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">crop_opened_tiff_by_lat_lon_bounds_and_return_mosaic</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">lat_min</span><span class="p">,</span> <span class="n">lat_max</span><span class="p">,</span> <span class="n">lon_min</span><span class="p">,</span> <span class="n">lon_max</span><span class="p">)</span>
+                <span class="n">lambda_p_mosaic</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">crop_opened_tiff_by_lat_lon_bounds_and_return_mosaic</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">lat_min</span><span class="p">,</span> <span class="n">lat_max</span><span class="p">,</span> <span class="n">lon_min</span><span class="p">,</span> <span class="n">lon_max</span><span class="p">)</span>
+                <span class="n">building_height_mosaic</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">crop_opened_tiff_by_lat_lon_bounds_and_return_mosaic</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">lat_min</span><span class="p">,</span> <span class="n">lat_max</span><span class="p">,</span> <span class="n">lon_min</span><span class="p">,</span> <span class="n">lon_max</span><span class="p">)</span>
+
+                <span class="c1"># Replace invalid values (e.g., 255) with zero and calculate the averages</span>
+                <span class="n">lambda_b_mosaic</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">lambda_b_mosaic</span> <span class="o">==</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">lambda_b_mosaic</span><span class="p">)</span> <span class="o">/</span> <span class="mf">20.0</span>  <span class="c1"># Scale factor for LAMBDA_B</span>
+                <span class="n">lambda_p_mosaic</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">lambda_p_mosaic</span> <span class="o">==</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">lambda_p_mosaic</span><span class="p">)</span> <span class="o">/</span> <span class="mf">100.0</span>  <span class="c1"># Scale factor for LAMBDA_P</span>
+                <span class="n">building_height_mosaic</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">building_height_mosaic</span> <span class="o">==</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">building_height_mosaic</span><span class="p">)</span>
+
+                <span class="c1"># Store the averaged LAMBDA_B and LAMBDA_P values</span>
+                <span class="n">lambda_b_grid</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">lambda_b_mosaic</span><span class="p">)</span>
+                <span class="n">lambda_p_grid</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">lambda_p_mosaic</span><span class="p">)</span>
+                
+                <span class="c1"># Weighted building height calculation</span>
+                <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">lambda_p_mosaic</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">weighted_building_height_grid</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">building_height_mosaic</span> <span class="o">*</span> <span class="n">lambda_p_mosaic</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">lambda_p_mosaic</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">weighted_building_height_grid</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># Handle empty grid cells</span>
+                
+                <span class="c1"># Calculate geometric mean and standard deviation of building heights</span>
+                <span class="n">valid_heights</span> <span class="o">=</span> <span class="n">building_height_mosaic</span><span class="p">[</span><span class="n">building_height_mosaic</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">]</span>  <span class="c1"># Exclude invalid, zero or too small heights</span>
+                <span class="k">if</span> <span class="n">valid_heights</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">mean_building_height_grid</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">valid_heights</span><span class="p">)))</span> <span class="c1"># Geometric mean</span>
+                    <span class="n">std_building_height_grid</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">valid_heights</span><span class="p">)</span>  <span class="c1"># Standard deviation</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">mean_building_height_grid</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+                    <span class="n">std_building_height_grid</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+                <span class="c1"># Compute FAI for each direction</span>
+                <span class="n">fai_ij</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">lambda_b_mosaic</span> <span class="o">-</span> <span class="n">lambda_p_mosaic</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">fai_ij</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">frontal_area_index</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">fai_ij</span> <span class="o">/</span> <span class="mi">4</span> <span class="c1"># FAI for each direction </span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">frontal_area_index</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+                <span class="c1"># Calculate building height distribution for this grid cell</span>
+                <span class="n">bin_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">digitize</span><span class="p">(</span><span class="n">building_height_mosaic</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">bin_edges</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">lambda_p_mosaic</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">bin_label</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">bin_labels</span><span class="p">):</span>
+                        <span class="n">geo_em_ds</span><span class="p">[</span><span class="s1">&#39;URB_PARAM&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span> <span class="n">bin_label</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">lambda_p_mosaic</span> <span class="o">*</span> <span class="p">(</span><span class="n">bin_indices</span> <span class="o">==</span> <span class="p">(</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)))</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">lambda_p_mosaic</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span> <span class="c1"># Convert to percentage</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">bin_label</span> <span class="ow">in</span> <span class="n">bin_labels</span><span class="p">:</span>
+                        <span class="n">geo_em_ds</span><span class="p">[</span><span class="s1">&#39;URB_PARAM&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span> <span class="n">bin_label</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="c1"># Store the calculated values in the geo_em dataset</span>
+    <span class="n">geo_em_ds</span><span class="p">[</span><span class="s1">&#39;URB_PARAM&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span> <span class="mi">90</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">lambda_p_grid</span>  <span class="c1"># Field 90: LAMBDA_P</span>
+    <span class="n">geo_em_ds</span><span class="p">[</span><span class="s1">&#39;URB_PARAM&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span> <span class="mi">91</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">mean_building_height_grid</span>  <span class="c1"># Field 91: Geometric mean of building heights</span>
+    <span class="n">geo_em_ds</span><span class="p">[</span><span class="s1">&#39;URB_PARAM&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span> <span class="mi">92</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">std_building_height_grid</span>  <span class="c1"># Field 92: Standard deviation of building heights</span>
+    <span class="n">geo_em_ds</span><span class="p">[</span><span class="s1">&#39;URB_PARAM&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span> <span class="mi">93</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">weighted_building_height_grid</span>  <span class="c1"># Field 93: Building Height (weighted)</span>
+    <span class="n">geo_em_ds</span><span class="p">[</span><span class="s1">&#39;URB_PARAM&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span> <span class="mi">94</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">lambda_b_grid</span>  <span class="c1"># Field 94: LAMBDA_B</span>
+    
+    <span class="c1"># Store the Frontal Area Index for each direction</span>
+    <span class="n">geo_em_ds</span><span class="p">[</span><span class="s1">&#39;URB_PARAM&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span> <span class="mi">96</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">frontal_area_index</span>  <span class="c1"># Field 96: FAI North</span>
+    <span class="n">geo_em_ds</span><span class="p">[</span><span class="s1">&#39;URB_PARAM&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span> <span class="mi">97</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">frontal_area_index</span>  <span class="c1"># Field 97: FAI South</span>
+    <span class="n">geo_em_ds</span><span class="p">[</span><span class="s1">&#39;URB_PARAM&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span> <span class="mi">98</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">frontal_area_index</span>  <span class="c1"># Field 98: FAI East</span>
+    <span class="n">geo_em_ds</span><span class="p">[</span><span class="s1">&#39;URB_PARAM&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span> <span class="mi">99</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">frontal_area_index</span>  <span class="c1"># Field 99: FAI West</span>
+
+    <span class="k">return</span> <span class="n">geo_em_ds</span></div>
+
+
+<div class="viewcode-block" id="add_urb_param_fields_if_not_exists">
+<a class="viewcode-back" href="../../modules.html#wrfup.calculation.add_urb_param_fields_if_not_exists">[docs]</a>
+<span class="k">def</span> <span class="nf">add_urb_param_fields_if_not_exists</span><span class="p">(</span><span class="n">geo_em_ds</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Ensure that the geo_em file contains the URB_PARAM fields, initialized if necessary.&quot;&quot;&quot;</span>
+    <span class="c1"># Check if the URB_PARAM field exists</span>
+    <span class="k">if</span> <span class="s1">&#39;URB_PARAM&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">geo_em_ds</span><span class="p">:</span>
+        <span class="c1"># Initialize the URB_PARAM field with zeros</span>
+        <span class="n">time_dim</span> <span class="o">=</span> <span class="n">geo_em_ds</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="s1">&#39;Time&#39;</span><span class="p">]</span>
+        <span class="n">num_slices</span> <span class="o">=</span> <span class="mi">132</span>  <span class="c1"># Number of slices (including lambda_b, lambda_p, etc.)</span>
+        <span class="n">south_north_dim</span> <span class="o">=</span> <span class="n">geo_em_ds</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="s1">&#39;south_north&#39;</span><span class="p">]</span>
+        <span class="n">west_east_dim</span> <span class="o">=</span> <span class="n">geo_em_ds</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="s1">&#39;west_east&#39;</span><span class="p">]</span>
+        <span class="n">urb_param_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">time_dim</span><span class="p">,</span> <span class="n">num_slices</span><span class="p">,</span> <span class="n">south_north_dim</span><span class="p">,</span> <span class="n">west_east_dim</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+        <span class="c1"># Create the DataArray and add it to the geo_em dataset</span>
+        <span class="n">geo_em_ds</span><span class="p">[</span><span class="s1">&#39;URB_PARAM&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
+            <span class="n">urb_param_data</span><span class="p">,</span>
+            <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Time&#39;</span><span class="p">,</span> <span class="s1">&#39;urb_param_slices&#39;</span><span class="p">,</span> <span class="s1">&#39;south_north&#39;</span><span class="p">,</span> <span class="s1">&#39;west_east&#39;</span><span class="p">],</span>
+            <span class="n">attrs</span><span class="o">=</span><span class="p">{</span>
+                <span class="s1">&#39;FieldType&#39;</span><span class="p">:</span> <span class="mi">104</span><span class="p">,</span>
+                <span class="s1">&#39;MemoryOrder&#39;</span><span class="p">:</span> <span class="s1">&#39;XYZ &#39;</span><span class="p">,</span>
+                <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="s1">&#39;various&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Urban canopy parameters&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;stagger&#39;</span><span class="p">:</span> <span class="s1">&#39;M&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;sr_x&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                <span class="s1">&#39;sr_y&#39;</span><span class="p">:</span> <span class="mi">1</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">geo_em_ds</span></div>
+
+
+
+
+<div class="viewcode-block" id="calculate_frc_urb2d">
+<a class="viewcode-back" href="../../modules.html#wrfup.calculation.calculate_frc_urb2d">[docs]</a>
+<span class="k">def</span> <span class="nf">calculate_frc_urb2d</span><span class="p">(</span><span class="n">info</span><span class="p">,</span> <span class="n">geo_em_ds</span><span class="p">,</span> <span class="n">merged_tiff_path</span><span class="p">,</span> <span class="n">field_name</span><span class="o">=</span><span class="s1">&#39;FRC_URB2D&#39;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the FRC_URB2D field by averaging urban fraction values within each geo_em grid cell.</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        info (Info): The configuration object containing paths and settings.</span>
+<span class="sd">        geo_em_ds (xarray.Dataset): The opened geo_em dataset.</span>
+<span class="sd">        merged_tiff_path (str): Path to the merged GeoTIFF file containing urban fraction data.</span>
+<span class="sd">        field_name (str): The field name to store the data (default: &#39;FRC_URB2D&#39;).</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        np.ndarray: 2D array of calculated FRC_URB2D values.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Ensure FRC_URB2D field exists in geo_em and is initialized</span>
+    <span class="n">geo_em_ds</span> <span class="o">=</span> <span class="n">add_frc_urb2d_field_if_not_exists</span><span class="p">(</span><span class="n">geo_em_ds</span><span class="p">,</span> <span class="n">field_name</span><span class="p">)</span>
+
+    <span class="c1"># Open the merged GeoTIFF containing urban fraction data</span>
+    <span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">merged_tiff_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">src</span><span class="p">:</span>
+        <span class="c1"># Initialize an array to store the urban fraction for each grid cell</span>
+        <span class="n">urban_fraction_geo_em</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">geo_em_ds</span><span class="p">[</span><span class="s1">&#39;XLAT_M&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+
+        <span class="c1"># Define the lat/lon coordinates of the geo_em grid</span>
+        <span class="n">lats_c_geo_em</span> <span class="o">=</span> <span class="n">geo_em_ds</span><span class="p">[</span><span class="s1">&#39;XLAT_C&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>  <span class="c1"># Latitude corners</span>
+        <span class="n">lons_c_geo_em</span> <span class="o">=</span> <span class="n">geo_em_ds</span><span class="p">[</span><span class="s1">&#39;XLONG_C&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>  <span class="c1"># Longitude corners</span>
+
+        <span class="c1"># Loop through each grid cell in geo_em and calculate the average urban fraction from GeoTIFF</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">lats_c_geo_em</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Calculating FRC_URB2D&quot;</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">lons_c_geo_em</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="c1"># Define lat/lon bounds for the current grid cell</span>
+                <span class="n">lat_min</span><span class="p">,</span> <span class="n">lat_max</span> <span class="o">=</span> <span class="n">lats_c_geo_em</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">],</span> <span class="n">lats_c_geo_em</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+                <span class="n">lon_min</span><span class="p">,</span> <span class="n">lon_max</span> <span class="o">=</span> <span class="n">lons_c_geo_em</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">],</span> <span class="n">lons_c_geo_em</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+
+                <span class="c1"># Crop the GeoTIFF based on these lat/lon bounds and return the mosaic</span>
+                <span class="n">mosaic</span><span class="p">,</span> <span class="n">transform</span> <span class="o">=</span> <span class="n">crop_opened_tiff_by_lat_lon_bounds_and_return_mosaic</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">lat_min</span><span class="p">,</span> <span class="n">lat_max</span><span class="p">,</span> <span class="n">lon_min</span><span class="p">,</span> <span class="n">lon_max</span><span class="p">)</span>
+
+                <span class="c1"># Replace invalid values (e.g., 255) with zero and calculate the average</span>
+                <span class="n">mosaic</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">mosaic</span> <span class="o">==</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">mosaic</span><span class="p">)</span>  <span class="c1"># Adjust based on your invalid value</span>
+                <span class="n">urban_fraction_geo_em</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">mosaic</span><span class="p">)</span> <span class="o">/</span> <span class="mf">100.0</span>  <span class="c1"># Convert to fraction (0-1)</span>
+
+        <span class="c1"># Store the calculated urban fraction in the geo_em dataset</span>
+        <span class="n">geo_em_ds</span><span class="p">[</span><span class="n">field_name</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">urban_fraction_geo_em</span>
+
+    <span class="k">return</span> <span class="n">geo_em_ds</span></div>
+
+
+
+<div class="viewcode-block" id="add_frc_urb2d_field_if_not_exists">
+<a class="viewcode-back" href="../../modules.html#wrfup.calculation.add_frc_urb2d_field_if_not_exists">[docs]</a>
+<span class="k">def</span> <span class="nf">add_frc_urb2d_field_if_not_exists</span><span class="p">(</span><span class="n">geo_em_ds</span><span class="p">,</span> <span class="n">field_name</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Ensure that the geo_em file contains the FRC_URB2D field, initialized if necessary.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">field_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">geo_em_ds</span><span class="p">:</span>
+        <span class="c1"># Initialize the FRC_URB2D field with zeros</span>
+        <span class="n">time_dim</span> <span class="o">=</span> <span class="n">geo_em_ds</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="s1">&#39;Time&#39;</span><span class="p">]</span>
+        <span class="n">south_north_dim</span> <span class="o">=</span> <span class="n">geo_em_ds</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="s1">&#39;south_north&#39;</span><span class="p">]</span>
+        <span class="n">west_east_dim</span> <span class="o">=</span> <span class="n">geo_em_ds</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="s1">&#39;west_east&#39;</span><span class="p">]</span>
+        <span class="n">frc_urb2d_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">time_dim</span><span class="p">,</span> <span class="n">south_north_dim</span><span class="p">,</span> <span class="n">west_east_dim</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+        <span class="c1"># Create the DataArray and add it to the geo_em dataset</span>
+        <span class="n">geo_em_ds</span><span class="p">[</span><span class="n">field_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
+            <span class="n">frc_urb2d_data</span><span class="p">,</span>
+            <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Time&#39;</span><span class="p">,</span> <span class="s1">&#39;south_north&#39;</span><span class="p">,</span> <span class="s1">&#39;west_east&#39;</span><span class="p">],</span>
+            <span class="n">attrs</span><span class="o">=</span><span class="p">{</span>
+                <span class="s1">&#39;FieldType&#39;</span><span class="p">:</span> <span class="mi">104</span><span class="p">,</span>
+                <span class="s1">&#39;MemoryOrder&#39;</span><span class="p">:</span> <span class="s1">&#39;XY &#39;</span><span class="p">,</span>
+                <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="s1">&#39;fraction&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Urban Fraction&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;stagger&#39;</span><span class="p">:</span> <span class="s1">&#39;M&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;sr_x&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                <span class="s1">&#39;sr_y&#39;</span><span class="p">:</span> <span class="mi">1</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+        <span class="n">geo_em_ds</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;FLAG_FRC_URB2D&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># Mark the flag for FRC_URB2D field</span>
+
+    <span class="k">return</span> <span class="n">geo_em_ds</span></div>
+
+
+
+<div class="viewcode-block" id="crop_opened_tiff_by_lat_lon_bounds_and_return_mosaic">
+<a class="viewcode-back" href="../../modules.html#wrfup.calculation.crop_opened_tiff_by_lat_lon_bounds_and_return_mosaic">[docs]</a>
+<span class="k">def</span> <span class="nf">crop_opened_tiff_by_lat_lon_bounds_and_return_mosaic</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">band</span><span class="p">,</span> <span class="n">lat_min</span><span class="p">,</span> <span class="n">lat_max</span><span class="p">,</span> <span class="n">lon_min</span><span class="p">,</span> <span class="n">lon_max</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Crop an open rasterio dataset to the specified latitude and longitude bounds and return the cropped mosaic as a numpy array.</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        src: rasterio.io.DatasetReader, an open rasterio dataset.</span>
+<span class="sd">        band: int, the band to read.</span>
+<span class="sd">        lat_min: float, minimum latitude of the cropping boundary.</span>
+<span class="sd">        lat_max: float, maximum latitude of the cropping boundary.</span>
+<span class="sd">        lon_min: float, minimum longitude of the cropping boundary.</span>
+<span class="sd">        lon_max: float, maximum longitude of the cropping boundary.</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        numpy.ndarray: The cropped mosaic array.</span>
+<span class="sd">        rasterio.transform.Affine: The transformation of the cropped mosaic.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Convert lat/lon bounds to pixel coordinates within the GeoTIFF</span>
+    <span class="n">row_min</span><span class="p">,</span> <span class="n">col_min</span> <span class="o">=</span> <span class="n">src</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">lon_min</span><span class="p">,</span> <span class="n">lat_max</span><span class="p">)</span>
+    <span class="n">row_max</span><span class="p">,</span> <span class="n">col_max</span> <span class="o">=</span> <span class="n">src</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">lon_max</span><span class="p">,</span> <span class="n">lat_min</span><span class="p">)</span>
+
+    <span class="c1"># Read the data from the calculated window</span>
+    <span class="n">window</span> <span class="o">=</span> <span class="p">((</span><span class="n">row_min</span><span class="p">,</span> <span class="n">row_max</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="n">col_min</span><span class="p">,</span> <span class="n">col_max</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="n">mosaic</span> <span class="o">=</span> <span class="n">src</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">band</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="n">window</span><span class="p">)</span>
+
+    <span class="c1"># Return the cropped mosaic and its affine transformation</span>
+    <span class="k">return</span> <span class="n">mosaic</span><span class="p">,</span> <span class="n">src</span><span class="o">.</span><span class="n">window_transform</span><span class="p">(</span><span class="n">window</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Jacobo Gabeiras Penas.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

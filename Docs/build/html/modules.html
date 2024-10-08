@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>wrfup package &mdash; wrfup 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=92fd9be5" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=8d563738"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Welcome to wrfup’s documentation!" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            wrfup
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">wrfup package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#wrfup.main.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#wrfup.download.download_and_extract_zip"><code class="docutils literal notranslate"><span class="pre">download_and_extract_zip()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#wrfup.download.download_tiles"><code class="docutils literal notranslate"><span class="pre">download_tiles()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#wrfup.download.get_tile_names_in_aoi"><code class="docutils literal notranslate"><span class="pre">get_tile_names_in_aoi()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#wrfup.download.get_total_download_size"><code class="docutils literal notranslate"><span class="pre">get_total_download_size()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#wrfup.download.lat_lon_to_tile_indices"><code class="docutils literal notranslate"><span class="pre">lat_lon_to_tile_indices()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#wrfup.download.merge_tiles"><code class="docutils literal notranslate"><span class="pre">merge_tiles()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#wrfup.calculation.add_frc_urb2d_field_if_not_exists"><code class="docutils literal notranslate"><span class="pre">add_frc_urb2d_field_if_not_exists()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#wrfup.calculation.add_urb_param_fields_if_not_exists"><code class="docutils literal notranslate"><span class="pre">add_urb_param_fields_if_not_exists()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#wrfup.calculation.calculate_frc_urb2d"><code class="docutils literal notranslate"><span class="pre">calculate_frc_urb2d()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#wrfup.calculation.calculate_urb_param"><code class="docutils literal notranslate"><span class="pre">calculate_urb_param()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#wrfup.calculation.crop_opened_tiff_by_lat_lon_bounds_and_return_mosaic"><code class="docutils literal notranslate"><span class="pre">crop_opened_tiff_by_lat_lon_bounds_and_return_mosaic()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#wrfup.utils.check_geo_em_file"><code class="docutils literal notranslate"><span class="pre">check_geo_em_file()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#wrfup.utils.clean_up"><code class="docutils literal notranslate"><span class="pre">clean_up()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#wrfup.utils.get_lat_lon_extent"><code class="docutils literal notranslate"><span class="pre">get_lat_lon_extent()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#wrfup.info.Info"><code class="docutils literal notranslate"><span class="pre">Info</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">wrfup</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">wrfup package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/modules.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-wrfup.main">
+<span id="wrfup-package"></span><h1>wrfup package<a class="headerlink" href="#module-wrfup.main" title="Link to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="wrfup.main.main">
+<span class="sig-prename descclassname"><span class="pre">wrfup.main.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">argv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/wrfup/main.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#wrfup.main.main" title="Link to this definition"></a></dt>
+<dd><p>Main entry point for wrfup package.</p>
+</dd></dl>
+
+<dl class="py function" id="module-wrfup.download">
+<dt class="sig sig-object py" id="wrfup.download.download_and_extract_zip">
+<span class="sig-prename descclassname"><span class="pre">wrfup.download.</span></span><span class="sig-name descname"><span class="pre">download_and_extract_zip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">zip_url</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extraction_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_num</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_files</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/wrfup/download.html#download_and_extract_zip"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#wrfup.download.download_and_extract_zip" title="Link to this definition"></a></dt>
+<dd><p>Download and extract a zip file from a URL with real-time progress tracking.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="wrfup.download.download_tiles">
+<span class="sig-prename descclassname"><span class="pre">wrfup.download.</span></span><span class="sig-name descname"><span class="pre">download_tiles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tile_names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">download_url</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/wrfup/download.html#download_tiles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#wrfup.download.download_tiles" title="Link to this definition"></a></dt>
+<dd><p>Download the urban fraction or URB_PARAM tiles for the given tile names.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tile_names</strong> (<em>list</em>) – List of tile names to download.</p></li>
+<li><p><strong>save_dir</strong> (<em>str</em>) – Directory to save the downloaded tiles.</p></li>
+<li><p><strong>download_url</strong> (<em>str</em>) – Base URL for downloading the tiles.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="wrfup.download.get_tile_names_in_aoi">
+<span class="sig-prename descclassname"><span class="pre">wrfup.download.</span></span><span class="sig-name descname"><span class="pre">get_tile_names_in_aoi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lat_min</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lat_max</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lon_min</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lon_max</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/wrfup/download.html#get_tile_names_in_aoi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#wrfup.download.get_tile_names_in_aoi" title="Link to this definition"></a></dt>
+<dd><p>Get the list of tile names for the area of interest (AOI) based on latitude and longitude,
+with different naming conventions for FRC_URB2D and URB_PARAM fields.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lat_min</strong> (<em>float</em>) – Minimum latitude of AOI.</p></li>
+<li><p><strong>lat_max</strong> (<em>float</em>) – Maximum latitude of AOI.</p></li>
+<li><p><strong>lon_min</strong> (<em>float</em>) – Minimum longitude of AOI.</p></li>
+<li><p><strong>lon_max</strong> (<em>float</em>) – Maximum longitude of AOI.</p></li>
+<li><p><strong>field</strong> (<em>str</em>) – The field type (‘FRC_URB2D’ or ‘URB_PARAM’).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of tile names.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="wrfup.download.get_total_download_size">
+<span class="sig-prename descclassname"><span class="pre">wrfup.download.</span></span><span class="sig-name descname"><span class="pre">get_total_download_size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tile_names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">download_url</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/wrfup/download.html#get_total_download_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#wrfup.download.get_total_download_size" title="Link to this definition"></a></dt>
+<dd><p>Calculate the total size of all tiles to be downloaded.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tile_names</strong> (<em>list</em>) – List of tile names.</p></li>
+<li><p><strong>download_url</strong> (<em>str</em>) – Base URL to check file size.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Total size in bytes.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="wrfup.download.lat_lon_to_tile_indices">
+<span class="sig-prename descclassname"><span class="pre">wrfup.download.</span></span><span class="sig-name descname"><span class="pre">lat_lon_to_tile_indices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid_rows</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">16</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid_cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">16</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/wrfup/download.html#lat_lon_to_tile_indices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#wrfup.download.lat_lon_to_tile_indices" title="Link to this definition"></a></dt>
+<dd><p>Convert latitude and longitude to grid tile index based on zoom level.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lat</strong> (<em>float</em>) – Latitude in degrees.</p></li>
+<li><p><strong>lon</strong> (<em>float</em>) – Longitude in degrees.</p></li>
+<li><p><strong>grid_rows</strong> (<em>int</em>) – Number of rows in the grid.</p></li>
+<li><p><strong>grid_cols</strong> (<em>int</em>) – Number of columns in the grid.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Row and column index of the tile.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(int, int)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="wrfup.download.merge_tiles">
+<span class="sig-prename descclassname"><span class="pre">wrfup.download.</span></span><span class="sig-name descname"><span class="pre">merge_tiles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tile_paths</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/wrfup/download.html#merge_tiles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#wrfup.download.merge_tiles" title="Link to this definition"></a></dt>
+<dd><p>Merge multiple tiles into a single mosaic and save as a compressed GeoTIFF.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tile_paths</strong> (<em>list</em>) – List of file paths for the tiles to be merged.</p></li>
+<li><p><strong>output_path</strong> (<em>str</em>) – Path to save the compressed merged file.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function" id="module-wrfup.calculation">
+<dt class="sig sig-object py" id="wrfup.calculation.add_frc_urb2d_field_if_not_exists">
+<span class="sig-prename descclassname"><span class="pre">wrfup.calculation.</span></span><span class="sig-name descname"><span class="pre">add_frc_urb2d_field_if_not_exists</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geo_em_ds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/wrfup/calculation.html#add_frc_urb2d_field_if_not_exists"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#wrfup.calculation.add_frc_urb2d_field_if_not_exists" title="Link to this definition"></a></dt>
+<dd><p>Ensure that the geo_em file contains the FRC_URB2D field, initialized if necessary.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="wrfup.calculation.add_urb_param_fields_if_not_exists">
+<span class="sig-prename descclassname"><span class="pre">wrfup.calculation.</span></span><span class="sig-name descname"><span class="pre">add_urb_param_fields_if_not_exists</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geo_em_ds</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/wrfup/calculation.html#add_urb_param_fields_if_not_exists"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#wrfup.calculation.add_urb_param_fields_if_not_exists" title="Link to this definition"></a></dt>
+<dd><p>Ensure that the geo_em file contains the URB_PARAM fields, initialized if necessary.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="wrfup.calculation.calculate_frc_urb2d">
+<span class="sig-prename descclassname"><span class="pre">wrfup.calculation.</span></span><span class="sig-name descname"><span class="pre">calculate_frc_urb2d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geo_em_ds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">merged_tiff_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'FRC_URB2D'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/wrfup/calculation.html#calculate_frc_urb2d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#wrfup.calculation.calculate_frc_urb2d" title="Link to this definition"></a></dt>
+<dd><p>Calculate the FRC_URB2D field by averaging urban fraction values within each geo_em grid cell.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>info</strong> (<a class="reference internal" href="#wrfup.info.Info" title="wrfup.info.Info"><em>Info</em></a>) – The configuration object containing paths and settings.</p></li>
+<li><p><strong>geo_em_ds</strong> (<em>xarray.Dataset</em>) – The opened geo_em dataset.</p></li>
+<li><p><strong>merged_tiff_path</strong> (<em>str</em>) – Path to the merged GeoTIFF file containing urban fraction data.</p></li>
+<li><p><strong>field_name</strong> (<em>str</em>) – The field name to store the data (default: ‘FRC_URB2D’).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>2D array of calculated FRC_URB2D values.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="wrfup.calculation.calculate_urb_param">
+<span class="sig-prename descclassname"><span class="pre">wrfup.calculation.</span></span><span class="sig-name descname"><span class="pre">calculate_urb_param</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geo_em_ds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">merged_tiff_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'URB_PARAM'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/wrfup/calculation.html#calculate_urb_param"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#wrfup.calculation.calculate_urb_param" title="Link to this definition"></a></dt>
+<dd><p>Calculate the URB_PARAM field.</p>
+<p>This calculation follows the <strong>NUDAPT 44</strong> field structure:</p>
+<ul class="simple">
+<li><p><strong>LAMBDA_P (Plan Area Fraction)</strong>:
+Stored in slice [90,:,:] of <cite>URB_PARAM</cite>. It represents the fraction of the grid cell’s area covered by building footprints.</p></li>
+<li><p><strong>Mean Building Height (Geometric Mean)</strong>:
+Stored in slice [91,:,:] of <cite>URB_PARAM</cite>. It is the geometric mean of building heights within the grid cell.</p></li>
+<li><p><strong>Standard Deviation of Building Heights</strong>:
+Stored in slice [92,:,:] of <cite>URB_PARAM</cite>. It calculates the standard deviation of building heights.</p></li>
+<li><p><strong>Weighted Building Height</strong>:
+Stored in slice [93,:,:] of <cite>URB_PARAM</cite>. It represents the average building height weighted by the planar surface area (LAMBDA_P).</p></li>
+<li><p><strong>LAMBDA_B (Frontal Area Fraction)</strong>:
+Stored in slice [94,:,:] of <cite>URB_PARAM</cite>. It represents the fraction of the grid cell’s frontal area occupied by building walls.</p></li>
+<li><p><strong>Frontal Area Index (FAI)</strong>:
+- <strong>North</strong>: Stored in slice [96,:,:] of <cite>URB_PARAM</cite>.
+- <strong>South</strong>: Stored in slice [97,:,:] of <cite>URB_PARAM</cite>.
+- <strong>East</strong>: Stored in slice [98,:,:] of <cite>URB_PARAM</cite>.
+- <strong>West</strong>: Stored in slice [99,:,:] of <cite>URB_PARAM</cite>.</p></li>
+<li><p><strong>Building Height Distribution</strong>:
+Stored in slices [117:132,:,:] of <cite>URB_PARAM</cite>.</p></li>
+</ul>
+<p>The building height distribution is computed using the following bin ranges (in meters):
+- 0-5, 5-10, 10-15, …, up to 70+ meters.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="wrfup.calculation.crop_opened_tiff_by_lat_lon_bounds_and_return_mosaic">
+<span class="sig-prename descclassname"><span class="pre">wrfup.calculation.</span></span><span class="sig-name descname"><span class="pre">crop_opened_tiff_by_lat_lon_bounds_and_return_mosaic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">src</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">band</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lat_min</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lat_max</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lon_min</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lon_max</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/wrfup/calculation.html#crop_opened_tiff_by_lat_lon_bounds_and_return_mosaic"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#wrfup.calculation.crop_opened_tiff_by_lat_lon_bounds_and_return_mosaic" title="Link to this definition"></a></dt>
+<dd><p>Crop an open rasterio dataset to the specified latitude and longitude bounds and return the cropped mosaic as a numpy array.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src</strong> – rasterio.io.DatasetReader, an open rasterio dataset.</p></li>
+<li><p><strong>band</strong> – int, the band to read.</p></li>
+<li><p><strong>lat_min</strong> – float, minimum latitude of the cropping boundary.</p></li>
+<li><p><strong>lat_max</strong> – float, maximum latitude of the cropping boundary.</p></li>
+<li><p><strong>lon_min</strong> – float, minimum longitude of the cropping boundary.</p></li>
+<li><p><strong>lon_max</strong> – float, maximum longitude of the cropping boundary.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The cropped mosaic array.
+rasterio.transform.Affine: The transformation of the cropped mosaic.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function" id="module-wrfup.utils">
+<dt class="sig sig-object py" id="wrfup.utils.check_geo_em_file">
+<span class="sig-prename descclassname"><span class="pre">wrfup.utils.</span></span><span class="sig-name descname"><span class="pre">check_geo_em_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geo_em_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/wrfup/utils.html#check_geo_em_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#wrfup.utils.check_geo_em_file" title="Link to this definition"></a></dt>
+<dd><p>Check the geo_em file for the required fields before processing.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>geo_em_file</strong> (<em>str</em>) – Path to the geo_em file.</p></li>
+<li><p><strong>field</strong> (<em>str</em>) – The field to check for (FRC_URB2D or URB_PARAM).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The opened geo_em dataset if the file is valid and all required fields are present.
+None: If the file is invalid or fields are missing.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dataset (xarray.Dataset)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="wrfup.utils.clean_up">
+<span class="sig-prename descclassname"><span class="pre">wrfup.utils.</span></span><span class="sig-name descname"><span class="pre">clean_up</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">temp_dir</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/wrfup/utils.html#clean_up"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#wrfup.utils.clean_up" title="Link to this definition"></a></dt>
+<dd><p>Remove temporary files and directories.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>temp_dir</strong> (<em>str</em>) – The directory where temporary files are stored.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="wrfup.utils.get_lat_lon_extent">
+<span class="sig-prename descclassname"><span class="pre">wrfup.utils.</span></span><span class="sig-name descname"><span class="pre">get_lat_lon_extent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geo_em_file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/wrfup/utils.html#get_lat_lon_extent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#wrfup.utils.get_lat_lon_extent" title="Link to this definition"></a></dt>
+<dd><p>Extract the latitude and longitude extents from the geo_em file using xarray.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>geo_em_file</strong> (<em>str</em>) – Path to the geo_em file.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Tuple containing min/max latitudes and longitudes.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class" id="module-wrfup.info">
+<dt class="sig sig-object py" id="wrfup.info.Info">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">wrfup.info.</span></span><span class="sig-name descname"><span class="pre">Info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geo_em_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">work_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp_dir</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/wrfup/info.html#Info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#wrfup.info.Info" title="Link to this definition"></a></dt>
+<dd><p>Store configuration and paths for processing.</p>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to wrfup’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Jacobo Gabeiras Penas.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -66,12 +66,12 @@ def main(argv=None):
 
     # Step 5: Download the necessary tiles based on field
     if info.field == 'FRC_URB2D':
-        download_tiles(tile_names, field_dir, FRC_URB2D_URL)
+        merged_tiff_path = download_tiles(tile_names, field_dir, FRC_URB2D_URL)
     elif info.field == 'URB_PARAM':
-        download_tiles(tile_names, field_dir, URB_PARAM_URL)
+        merged_tiff_path = download_tiles(tile_names, field_dir, URB_PARAM_URL)
 
     # Step 6: Perform calculations to prepare data for ingestion
-    merged_tiff_path = os.path.join(field_dir, 'merged_tiles.tif')
+    # merged_tiff_path = os.path.join(field_dir, 'merged_tiles.tif')
     if info.field == 'FRC_URB2D':
         # logging.info("Calculating FRC_URB2D field...")
         ds = calculate_frc_urb2d(info, ds, merged_tiff_path)

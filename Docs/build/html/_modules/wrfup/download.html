@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>wrfup.download &mdash; wrfup 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=92fd9be5" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=8d563738"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            wrfup
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">wrfup package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">wrfup</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">wrfup.download</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for wrfup.download</h1><div class="highlight"><pre>
+<span></span><span class="c1"># download.py in wrfup</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">import</span> <span class="nn">zipfile</span>
+<span class="kn">import</span> <span class="nn">io</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">rasterio</span>
+<span class="kn">from</span> <span class="nn">tqdm.auto</span> <span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">from</span> <span class="nn">rasterio.merge</span> <span class="kn">import</span> <span class="n">merge</span>
+
+<div class="viewcode-block" id="merge_tiles">
+<a class="viewcode-back" href="../../modules.html#wrfup.download.merge_tiles">[docs]</a>
+<span class="k">def</span> <span class="nf">merge_tiles</span><span class="p">(</span><span class="n">tile_paths</span><span class="p">,</span> <span class="n">output_path</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Merge multiple tiles into a single mosaic and save as a compressed GeoTIFF.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        tile_paths (list): List of file paths for the tiles to be merged.</span>
+<span class="sd">        output_path (str): Path to save the compressed merged file.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Open the raster files</span>
+    <span class="n">src_files_to_mosaic</span> <span class="o">=</span> <span class="p">[</span><span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">tile</span><span class="p">)</span> <span class="k">for</span> <span class="n">tile</span> <span class="ow">in</span> <span class="n">tile_paths</span><span class="p">]</span>
+
+    <span class="c1"># Merge the files into one mosaic</span>
+    <span class="n">mosaic</span><span class="p">,</span> <span class="n">out_trans</span> <span class="o">=</span> <span class="n">merge</span><span class="p">(</span><span class="n">src_files_to_mosaic</span><span class="p">)</span>
+
+    <span class="c1"># Define metadata for the output file, based on one of the inputs</span>
+    <span class="n">out_meta</span> <span class="o">=</span> <span class="n">src_files_to_mosaic</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="c1"># Update the metadata to reflect the mosaic&#39;s properties and add compression</span>
+    <span class="n">out_meta</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
+        <span class="s2">&quot;driver&quot;</span><span class="p">:</span> <span class="s2">&quot;GTiff&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;height&quot;</span><span class="p">:</span> <span class="n">mosaic</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+        <span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="n">mosaic</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+        <span class="s2">&quot;transform&quot;</span><span class="p">:</span> <span class="n">out_trans</span><span class="p">,</span>
+        <span class="s2">&quot;compress&quot;</span><span class="p">:</span> <span class="s2">&quot;lzw&quot;</span>  <span class="c1"># Use LZW compression</span>
+    <span class="p">})</span>
+
+    <span class="c1"># Close all the source files after merging</span>
+    <span class="k">for</span> <span class="n">src</span> <span class="ow">in</span> <span class="n">src_files_to_mosaic</span><span class="p">:</span>
+        <span class="n">src</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="c1"># Write the compressed merged file to the output path</span>
+    <span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">out_meta</span><span class="p">)</span> <span class="k">as</span> <span class="n">dest</span><span class="p">:</span>
+        <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">mosaic</span><span class="p">)</span>
+
+    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Compressed merged file saved at </span><span class="si">{</span><span class="n">output_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="download_tiles">
+<a class="viewcode-back" href="../../modules.html#wrfup.download.download_tiles">[docs]</a>
+<span class="k">def</span> <span class="nf">download_tiles</span><span class="p">(</span><span class="n">tile_names</span><span class="p">,</span> <span class="n">save_dir</span><span class="p">,</span> <span class="n">download_url</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Download the urban fraction or URB_PARAM tiles for the given tile names.</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        tile_names (list): List of tile names to download.</span>
+<span class="sd">        save_dir (str): Directory to save the downloaded tiles.</span>
+<span class="sd">        download_url (str): Base URL for downloading the tiles.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">save_dir</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">save_dir</span><span class="p">)</span>
+
+    <span class="n">tile_paths</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># Calculate the total size of all the tiles to be downloaded</span>
+    <span class="n">total_size_in_bytes</span><span class="p">,</span> <span class="n">unknown_size</span> <span class="o">=</span> <span class="n">get_total_download_size</span><span class="p">(</span><span class="n">tile_names</span><span class="p">,</span> <span class="n">download_url</span><span class="p">)</span>
+    <span class="n">total_size_in_mb</span> <span class="o">=</span> <span class="n">total_size_in_bytes</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">)</span>
+
+    <span class="c1"># Ask the user for confirmation before downloading</span>
+    <span class="k">if</span> <span class="n">unknown_size</span><span class="p">:</span>
+        <span class="n">confirm</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Total download size is at least </span><span class="si">{</span><span class="n">total_size_in_mb</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> MB, but some sizes are unknown. Do you want to proceed? (y/n): &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">confirm</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Total download size is </span><span class="si">{</span><span class="n">total_size_in_mb</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> MB. Do you want to proceed? (y/n): &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">confirm</span> <span class="o">!=</span> <span class="s1">&#39;y&#39;</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Download canceled by the user.&quot;</span><span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="c1"># Use tqdm to display the progress of the download</span>
+    <span class="k">for</span> <span class="n">file_num</span><span class="p">,</span> <span class="n">tile_name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">tile_names</span><span class="p">):</span>
+        <span class="n">file_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">tile_name</span><span class="si">}</span><span class="s2">.zip&quot;</span>
+        <span class="n">zip_file_url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">download_url</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">download_and_extract_zip</span><span class="p">(</span><span class="n">zip_file_url</span><span class="p">,</span> <span class="n">save_dir</span><span class="p">,</span> <span class="n">file_num</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">tile_names</span><span class="p">))</span>
+        <span class="n">tile_paths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">save_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">tile_name</span><span class="si">}</span><span class="s2">.tif&quot;</span><span class="p">))</span>
+
+
+    <span class="c1"># If multiple tiles were downloaded, merge them</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tile_paths</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">output_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">save_dir</span><span class="p">,</span> <span class="s2">&quot;merged_tiles.tif&quot;</span><span class="p">)</span>
+        <span class="n">merge_tiles</span><span class="p">(</span><span class="n">tile_paths</span><span class="p">,</span> <span class="n">output_path</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Only one tile downloaded. No merging required.&quot;</span><span class="p">)</span>
+        <span class="n">output_path</span> <span class="o">=</span> <span class="n">tile_paths</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">output_path</span></div>
+
+
+<div class="viewcode-block" id="lat_lon_to_tile_indices">
+<a class="viewcode-back" href="../../modules.html#wrfup.download.lat_lon_to_tile_indices">[docs]</a>
+<span class="k">def</span> <span class="nf">lat_lon_to_tile_indices</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">grid_rows</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">grid_cols</span><span class="o">=</span><span class="mi">16</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert latitude and longitude to grid tile index based on zoom level.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        lat (float): Latitude in degrees.</span>
+<span class="sd">        lon (float): Longitude in degrees.</span>
+<span class="sd">        grid_rows (int): Number of rows in the grid.</span>
+<span class="sd">        grid_cols (int): Number of columns in the grid.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        (int, int): Row and column index of the tile.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">lat_min</span> <span class="o">=</span> <span class="o">-</span><span class="mi">60</span>
+    <span class="n">lat_max</span> <span class="o">=</span> <span class="mi">84</span>
+    <span class="n">lat_relative</span> <span class="o">=</span> <span class="p">(</span><span class="n">lat</span> <span class="o">-</span> <span class="n">lat_max</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">lat_min</span> <span class="o">-</span> <span class="n">lat_max</span><span class="p">)</span>
+    <span class="n">lon_relative</span> <span class="o">=</span> <span class="p">(</span><span class="n">lon</span> <span class="o">+</span> <span class="mi">180</span><span class="p">)</span> <span class="o">/</span> <span class="mi">360</span>
+
+    <span class="n">row_index</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">lat_relative</span> <span class="o">*</span> <span class="n">grid_rows</span><span class="p">)</span>
+    <span class="n">col_index</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">lon_relative</span> <span class="o">*</span> <span class="n">grid_cols</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">row_index</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">grid_rows</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span> <span class="nb">min</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">col_index</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">grid_cols</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="get_tile_names_in_aoi">
+<a class="viewcode-back" href="../../modules.html#wrfup.download.get_tile_names_in_aoi">[docs]</a>
+<span class="k">def</span> <span class="nf">get_tile_names_in_aoi</span><span class="p">(</span><span class="n">lat_min</span><span class="p">,</span> <span class="n">lat_max</span><span class="p">,</span> <span class="n">lon_min</span><span class="p">,</span> <span class="n">lon_max</span><span class="p">,</span> <span class="n">field</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get the list of tile names for the area of interest (AOI) based on latitude and longitude,</span>
+<span class="sd">    with different naming conventions for FRC_URB2D and URB_PARAM fields.</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        lat_min (float): Minimum latitude of AOI.</span>
+<span class="sd">        lat_max (float): Maximum latitude of AOI.</span>
+<span class="sd">        lon_min (float): Minimum longitude of AOI.</span>
+<span class="sd">        lon_max (float): Maximum longitude of AOI.</span>
+<span class="sd">        field (str): The field type (&#39;FRC_URB2D&#39; or &#39;URB_PARAM&#39;).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list: List of tile names.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">tile_names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">lat</span> <span class="ow">in</span> <span class="p">[</span><span class="n">lat_min</span><span class="p">,</span> <span class="n">lat_max</span><span class="p">]:</span>
+        <span class="k">for</span> <span class="n">lon</span> <span class="ow">in</span> <span class="p">[</span><span class="n">lon_min</span><span class="p">,</span> <span class="n">lon_max</span><span class="p">]:</span>
+            <span class="n">row_idx</span><span class="p">,</span> <span class="n">col_idx</span> <span class="o">=</span> <span class="n">lat_lon_to_tile_indices</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">field</span> <span class="o">==</span> <span class="s1">&#39;FRC_URB2D&#39;</span><span class="p">:</span>
+                <span class="n">tile_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">row_idx</span><span class="si">:</span><span class="s2">02d</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">col_idx</span><span class="si">:</span><span class="s2">02d</span><span class="si">}</span><span class="s2">_zoom4_urban_fraction_100m_int8&quot;</span>
+            <span class="k">elif</span> <span class="n">field</span> <span class="o">==</span> <span class="s1">&#39;URB_PARAM&#39;</span><span class="p">:</span>
+                <span class="n">tile_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">row_idx</span><span class="si">:</span><span class="s2">02d</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">col_idx</span><span class="si">:</span><span class="s2">02d</span><span class="si">}</span><span class="s2">_zoom4_URB_PARAM_100m&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown field type: </span><span class="si">{</span><span class="n">field</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            
+            <span class="n">tile_names</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">tile_name</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">tile_names</span><span class="p">)</span></div>
+
+
+
+
+<div class="viewcode-block" id="download_and_extract_zip">
+<a class="viewcode-back" href="../../modules.html#wrfup.download.download_and_extract_zip">[docs]</a>
+<span class="k">def</span> <span class="nf">download_and_extract_zip</span><span class="p">(</span><span class="n">zip_url</span><span class="p">,</span> <span class="n">extraction_path</span><span class="p">,</span> <span class="n">file_num</span><span class="p">,</span> <span class="n">total_files</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Download and extract a zip file from a URL with real-time progress tracking.&quot;&quot;&quot;</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">zip_url</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
+        <span class="c1"># Get the total file size from the headers</span>
+        <span class="n">total_size_in_bytes</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;content-length&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+        <span class="n">block_size</span> <span class="o">=</span> <span class="mi">1024</span>  <span class="c1"># 1 Kilobyte chunks</span>
+
+        <span class="c1"># Create a progress bar using tqdm</span>
+        <span class="n">progress_bar</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">total</span><span class="o">=</span><span class="n">total_size_in_bytes</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s1">&#39;iB&#39;</span><span class="p">,</span> <span class="n">unit_scale</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Downloading file </span><span class="si">{</span><span class="n">file_num</span><span class="si">}</span><span class="s2"> of </span><span class="si">{</span><span class="n">total_files</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Create a buffer to store the downloaded file</span>
+        <span class="n">buffer</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">response</span><span class="o">.</span><span class="n">iter_content</span><span class="p">(</span><span class="n">block_size</span><span class="p">):</span>
+            <span class="n">progress_bar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+            <span class="n">buffer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+        <span class="n">progress_bar</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+        <span class="c1"># Once the file is fully downloaded, we can extract it</span>
+        <span class="n">buffer</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># Reset buffer position to the start</span>
+        <span class="k">with</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">buffer</span><span class="p">)</span> <span class="k">as</span> <span class="n">thezip</span><span class="p">:</span>
+            <span class="n">thezip</span><span class="o">.</span><span class="n">extractall</span><span class="p">(</span><span class="n">extraction_path</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;File downloaded and extracted: </span><span class="si">{</span><span class="n">zip_url</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to download the file: </span><span class="si">{</span><span class="n">zip_url</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_total_download_size">
+<a class="viewcode-back" href="../../modules.html#wrfup.download.get_total_download_size">[docs]</a>
+<span class="k">def</span> <span class="nf">get_total_download_size</span><span class="p">(</span><span class="n">tile_names</span><span class="p">,</span> <span class="n">download_url</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the total size of all tiles to be downloaded.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        tile_names (list): List of tile names.</span>
+<span class="sd">        download_url (str): Base URL to check file size.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        int: Total size in bytes.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">total_size</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">unknown_size</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">for</span> <span class="n">tile_name</span> <span class="ow">in</span> <span class="n">tile_names</span><span class="p">:</span>
+        <span class="n">file_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">tile_name</span><span class="si">}</span><span class="s2">.zip&quot;</span>
+        <span class="n">zip_file_url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">download_url</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="c1"># Try a GET request to fetch the content-length header</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">zip_file_url</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
+                <span class="n">file_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;content-length&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+                <span class="k">if</span> <span class="n">file_size</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">total_size</span> <span class="o">+=</span> <span class="n">file_size</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not retrieve size for </span><span class="si">{</span><span class="n">zip_file_url</span><span class="si">}</span><span class="s2">. Marking as unknown size.&quot;</span><span class="p">)</span>
+                    <span class="n">unknown_size</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not retrieve size for </span><span class="si">{</span><span class="n">zip_file_url</span><span class="si">}</span><span class="s2">. Skipping...&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">requests</span><span class="o">.</span><span class="n">RequestException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error fetching file size for </span><span class="si">{</span><span class="n">zip_file_url</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">unknown_size</span> <span class="o">=</span> <span class="kc">True</span>
+    
+    <span class="k">return</span> <span class="n">total_size</span><span class="p">,</span> <span class="n">unknown_size</span></div>
+
+
+<span class="c1"># def download_and_extract_zip(zip_url, extraction_path):</span>
+<span class="c1">#     &quot;&quot;&quot;Download and extract a zip file from a URL with real-time progress tracking.&quot;&quot;&quot;</span>
+<span class="c1">#     response = requests.get(zip_url, stream=True)</span>
+    
+<span class="c1">#     if response.status_code == 200:</span>
+<span class="c1">#         total_size_in_bytes = int(response.headers.get(&#39;content-length&#39;, 0))</span>
+<span class="c1">#         block_size = 1024  # 1 Kilobyte chunks</span>
+
+<span class="c1">#         # Create a progress bar using tqdm</span>
+<span class="c1">#         progress_bar = tqdm(total=total_size_in_bytes, unit=&#39;iB&#39;, unit_scale=True, desc=f&quot;Downloading {zip_url}&quot;)</span>
+
+<span class="c1">#         buffer = io.BytesIO()</span>
+
+<span class="c1">#         for data in response.iter_content(block_size):</span>
+<span class="c1">#             progress_bar.update(len(data))</span>
+<span class="c1">#             buffer.write(data)</span>
+
+<span class="c1">#         progress_bar.close()</span>
+
+<span class="c1">#         # Extract the downloaded zip file</span>
+<span class="c1">#         buffer.seek(0)  # Reset buffer position to the start</span>
+<span class="c1">#         with zipfile.ZipFile(buffer) as thezip:</span>
+<span class="c1">#             thezip.extractall(extraction_path)</span>
+<span class="c1">#         logging.info(f&quot;File downloaded and extracted: {zip_url}&quot;)</span>
+<span class="c1">#     else:</span>
+<span class="c1">#         logging.error(f&quot;Failed to download the file: {zip_url}&quot;)</span>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Jacobo Gabeiras Penas.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

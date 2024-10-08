@@ -5,5 +5,7 @@ netCDF4
 pandas
 shapely
 fiona
+ipyleaflet
+ipywidgets
 xarray
 scipy

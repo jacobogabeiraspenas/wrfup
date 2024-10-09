@@ -1,4 +1,4 @@
-# wrfup: WRF Urban Parameters Toolkit
+# wrfup: The WRF Urban Parameters Toolkit
 ### A Python Tool for Ingesting Urban Morphology Data into WRF Simulations
 
 
@@ -10,16 +10,16 @@ Univ. Grenoble Alpes, CNRS, Grenoble INP, LEGI, Grenoble, 38000, France
 
 ### Summary
 
-wrfup is a Python-based tool designed to improve urban climate modeling in the Weather Research and Forecasting (WRF) model. By dynamically calculating key urban canopy parameters, wrfup enhances the precision of urban weather simulations. The package facilitates ingestion of high-resolution urban morphology data directly into WRF’s geo_em files, including crucial fields like **URB_PARAM** and **FRC_URB2D**. These parameters are vital for advanced urban modeling schemes such as SLUCM, BEP, and BEP+BEM. wrfup simplifies the workflow, offering an accessible and efficient method for preparing urban data for WRF simulations via terminal commands.  
+*wrfup* is a Python-based tool that significantly enhances urban climate modeling in the Weather Research and Forecasting (WRF) model by automating the ingestion of high-resolution urban morphology data. Through dynamic calculations of crucial urban canopy parameters—such as *URB_PARAM* and *FRC_URB2D*—*wrfup* enables precise simulations for advanced urban schemes like SLUCM, BEP, and BEP+BEM. This tool streamlines the traditionally complex process of integrating detailed city-specific data into WRF simulations, providing researchers with an accessible, fast, and scientifically robust workflow through simple terminal commands. This increased efficiency makes *wrfup* particularly valuable for urban climate studies, where accuracy and granularity of data are crucial for predicting phenomena like the urban heat island effect and energy balance.
 
 
 ### Statement of Need
 
-Accurately simulating urban climate and weather phenomena, such as the **urban heat island (UHI) effect**, altered wind patterns, and precipitation dynamics, is critical for improving local climate predictions in the context of urbanization. These phenomena can significantly influence public health, energy consumption, and urban planning. The **Weather Research and Forecasting (WRF)** model offers advanced urban parameterizations—**SLUCM (Single-Layer Urban Canopy Model)**, **BEP (Building Effect Parameterization)**, and **BEP+BEM (Building Energy Model)** [@bepplusbem]—which enable precise simulations of these urban effects. However, these parameterizations depend heavily on high-quality data about urban morphology, including building heights, building fraction and others.
+Accurately simulating urban climate and weather phenomena, such as the urban heat island (UHI) effect, altered wind patterns, and precipitation dynamics, is critical for improving local climate predictions in the context of urbanization. These phenomena can significantly influence public health, energy consumption, and urban planning. The *Weather Research and Forecasting (WRF)* model offers advanced urban parameterizations—*SLUCM (Single-Layer Urban Canopy Model)*, *BEP (Building Effect Parameterization)*, and *BEP+BEM (Building Energy Model)* [@bepplusbem]—which enable precise simulations of these urban effects. However, these parameterizations depend heavily on high-quality data about urban morphology, including building heights, building fraction and others.
 
-One major challenge lies in obtaining detailed, city-specific urban data. High-resolution datasets like **LiDAR** provide accurate urban morphology data but are often difficult to process, complex to integrate into models, and not universally available, especially in developing cities. The **WUDAPT (World Urban Database and Access Portal Tools)** [@EUWUDAPT] project addresses this gap by offering the **Local Climate Zone (LCZ)** framework, which generalizes urban areas into distinct zones based on physical characteristics. The **LCZ Generator** [@lczgenerator] and **W2W (WUDAPT to WRF)** [@w2w] further enhance and facilitate the integration process of LCZ data into the WRF model. However, this approach relies on generalized table values rather than specific, detailed urban structure data, which limits the accuracy of the simulations.
+One major challenge lies in obtaining detailed, city-specific urban data. High-resolution datasets like *LiDAR* provide accurate urban morphology data but are often difficult to process, complex to integrate into models, and not universally available, especially in developing cities. The *WUDAPT (World Urban Database and Access Portal Tools)* [@EUWUDAPT] project addresses this gap by offering the *Local Climate Zone (LCZ)* framework, which generalizes urban areas into distinct zones based on physical characteristics. The *LCZ Generator* [@lczgenerator] and *W2W (WUDAPT to WRF)* [@w2w] further enhance and facilitate the integration process of LCZ data into the WRF model. However, this approach relies on generalized table values rather than specific, detailed urban structure data, which limits the accuracy of the simulations.
 
-**wrfup** provides an efficient solution for integrating real-world urban data into WRF’s **geo_em** files. Unlike the complex LiDAR approach, which can be difficult and time-consuming, **wrfup** offers a much faster workflow—achievable within minutes—while maintaining a higher level of accuracy compared to generalized data frameworks like WUDAPT. By calculating key urban morphology parameters, **wrfup** supports advanced urban parameterizations (**SLUCM**, **BEP**, and **BEP+BEM**), allowing for detailed simulations that accurately reflect city-specific characteristics. It also complements **W2W**, enhancing its capabilities for simulating urban environments more precisely and effectively.
+*wrfup* provides an efficient solution for integrating real-world urban data into WRF’s *geo_em* files. Unlike the complex *LiDAR* approach, which can be difficult and time-consuming, *wrfup* offers a much faster workflow—achievable within minutes—while maintaining a higher level of accuracy compared to generalized data frameworks like *WUDAPT*. By calculating key urban morphology parameters, *wrfup* supports advanced urban parameterizations (*SLUCM*, *BEP*, and *BEP+BEM*), allowing for detailed simulations that accurately reflect city-specific characteristics. It also complements *W2W*, enhancing its capabilities for simulating urban environments more precisely and effectively.
 
 
 ### Software Description
@@ -32,11 +32,11 @@ The **wrfup** package is structured around modules that handle downloading data,
 - **Main Module**: The entry point of the package, which allows users to run commands from the terminal. It simplifies tasks such as ingesting the **URB_PARAM** and **FRC_URB2D** fields with one-line commands.
 - **Download Module**: Automates the process of downloading urban morphology data for a given area of interest (AOI). Data from sources like the **World Settlement Footprint 3D (WSF3D)** [@wsf3d] and **Urban Fraction** [@urban_fraction] datasets are used for these calculations.
 - **Calculation Module**: Responsible for calculating urban parameters such as:
-    - **Plan Area Fraction (LAMBDA_P)** stored in slice [90,:,:]
+    - **Plan Area Fraction** stored in slice [90,:,:]
     - **Mean Building Height** stored in slice [91,:,:]
     - **Standard deviation of Building Height** stored in slice [92,:,:]
     - **Weighted Building Height** stored in slice [93,:,:]
-    - **Frontal Area Fraction (LAMBDA_B)** stored in slice [94,:,:]
+    - **Frontal Area Fraction** stored in slice [94,:,:]
     - **Frontal Area Index** stored in slices [95-98,:,:] for different wind directions
     - **Building Height Distribution** stored in slices [117:132,:,:]
 - **Utility Module**: Handles tasks such as cleaning temporary files, verifying geo_em file integrity, and managing the output of modified **geo_em** files.
@@ -81,7 +81,24 @@ The **wrfup** tool is designed to work seamlessly with the Weather Research and 
 4. The **metgrid** tool integrates the updated **geo_em** file with meteorological data, preparing the input files for the WRF simulation.
 5. Finally, these preprocessed files are used by the **real** and **wrf** executables to run the actual weather or climate simulation, incorporating precise urban morphology data into the model.
 
+ 
+```mermaid
+graph LR
+    
+        direction TB
+        A1[Geogrid] --> geo_file{{geo_em.d0X.nc}}
+        P -.-> geo_file2{{geo_em_URB_PARAM.d0X.nc}}
+        geo_file2 --> |rename|A3
+        geo_file -.-> P[py4bem]
+        A2[ungrib] --> A3[metgrid]
+    
+    
+        direction LR
+        A3 --> B1[real]
+        B1 --> B2[wrf]
 
+   
+```
 
 ![Workflow Diagram](pics/diagram_wps_integration_corrected.png)
 

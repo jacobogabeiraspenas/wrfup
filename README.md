@@ -20,6 +20,12 @@ To install the `wrfup` package, simply use `pip`:
 pip install wrfup
 ```
 
+or
+
+```bash
+pip install -i https://test.pypi.org/simple/ wrfup==1.0.0
+```
+
 ## Usage
 
 ### Command-Line Interface (CLI)

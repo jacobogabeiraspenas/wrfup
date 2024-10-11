@@ -1,20 +1,46 @@
-.. wrfup documentation master file, created by
-   sphinx-quickstart on Tue Oct  8 10:06:56 2024.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+wrfup: WRF Urban Parameters Toolkit
+====================================
 
-Welcome to wrfup's documentation!
-=================================
+Welcome to the **wrfup** documentation! This tool enables users to integrate high-resolution, real-world urban data into WRF simulations efficiently. It provides essential functionalities to download, calculate, and ingest urban fields directly into WRF geo_em files. Using wrfup, users can enhance urban weather simulations with advanced support for urban parameterizations, including SLUCM, BEP, and BEP+BEM.
+
+.. image:: _static/logo.png
+   :alt: wrfup logo
+   :align: center
+   :width: 300px
+
+---
+
+Overview
+--------
+
+**wrfup** is a Python tool designed for urban climate modeling. It allows you to:
+
+- **Download** urban morphology data like building heights and urban fraction.
+- **Calculate** the necessary urban fields for WRF, such as **URB_PARAM** and **FRC_URB2D**.
+- **Ingest** these fields directly into WRF’s **geo_em** files, ensuring precise representation of urban areas in your simulations.
+
+
+---
+
+Contents
+--------
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: Sections:
 
+   installation
+   usage
+   features
    modules
 
+---
+
 Indices and tables
-==================
+===================
 
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
+

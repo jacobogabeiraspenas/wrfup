@@ -18,9 +18,6 @@ Overview
 - **Calculate** the necessary urban fields for WRF, such as **URB_PARAM** and **FRC_URB2D**.
 - **Ingest** these fields directly into WRF’s **geo_em** files, ensuring precise representation of urban areas in your simulations. 
 
-Contents
---------
-
 .. toctree::
    :maxdepth: 2
    :caption: Sections:

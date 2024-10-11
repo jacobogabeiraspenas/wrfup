@@ -8,16 +8,19 @@ Basic Command Structure
 You can use `wrfup` to calculate and ingest the **URB_PARAM** or **FRC_URB2D** fields directly into WRF’s geo_em files.
 
 To calculate and ingest **URB_PARAM** fields:
+
 .. code-block:: bash
 
    wrfup geo_em.d0X.nc URB_PARAM --work_dir YOUR_DIRECTORY
 
 To calculate and ingest **FRC_URB2D** fields:
+
 .. code-block:: bash
 
    wrfup geo_em.d0X.nc FRC_URB2D --work_dir YOUR_DIRECTORY
 
-### Options:
+Options:
+
 - `geo_em.d0X.nc`: The WRF geo_em file for the target domain (replace X with domain number).
 - `--work_dir`: Specify the directory where intermediate and final files will be stored.
 
@@ -30,7 +33,7 @@ Let's say you're working on an urban climate simulation for a specific city. Aft
 
 .. code-block:: bash
 
-   wrfup geo_em.d01.nc URB_PARAM --work_dir /path/to/working_directory
+   wrfup geo_em.d03.nc URB_PARAM --work_dir /path/to/working_directory
 
 3. You can now visualize and analyze the results in the modified **geo_em** file.
 

@@ -1,20 +1,17 @@
-.. wrfup documentation master file, created by
-   sphinx-quickstart on Tue Oct  8 10:06:56 2024.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+wrfup Documentation
+===================
 
-Welcome to wrfup's documentation!
-=================================
+Welcome to the wrfup documentation!
+
+Contents:
+---------
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: Sections:
 
+   installation
+   usage
+   features
    modules
 
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`

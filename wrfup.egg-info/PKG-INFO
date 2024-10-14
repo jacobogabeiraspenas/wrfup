@@ -58,8 +58,6 @@ Description: # wrfup (WRF Urban Parameters Toolkit)
         - `pandas`
         - `shapely`
         - `fiona`
-        - `ipyleaflet`
-        - `ipywidgets`
         - `xarray`
         - `scipy`
         

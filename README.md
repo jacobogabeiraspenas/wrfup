@@ -76,13 +76,10 @@ wrfup geo_em_URB_PARAM.d03.nc FRC_URB2D --work_dir /path/to/working_directory
 mv geo_em_URB_PARAM_FRC_URB2D.d03.nc geo_em.d03.nc
 ```
 
-## Modules
+## Documentation
 
-- **main**: Entry point for the command-line interface.
-- **download**: Download urban data tiles.
-- **calculation**: Compute fields like **URB_PARAM** and **FRC_URB2D**.
-- **utils**: Utilities for cleanup and validation.
-- **info**: Handle configurations and arguments.
+For detailed instructions and documentation, visit the [wrfup Documentation](https://wrfup.readthedocs.io/en/latest/).
+
 
 ## Development
 

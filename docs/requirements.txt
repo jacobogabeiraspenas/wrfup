@@ -3,10 +3,10 @@ tqdm>=4.62.3
 requests>=2.26.0
 netCDF4>=1.5.7
 pandas>=1.3.3
-shapely>=1.8.0
+shapely>=2.0.2
 fiona>=1.8.20
 rasterio>=1.2.10
 xarray==2023.1.0
-scipy==1.7.1  
+scipy==1.9.3  
 sphinx_rtd_theme
 

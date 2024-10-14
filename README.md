@@ -8,13 +8,15 @@
 
 **wrfup** is a Python package that ingests high-resolution urban morphology data into **WRF** (Weather Research and Forecasting). It automatically **downloads**, **calculates**, and **ingests** urban fields like **FRC_URB2D** (Urban Fraction) and **URB_PARAM** (Urban Parameters) directly into WRF's **geo_em** files. These fields are essential for accurate urban weather simulations and are compatible with WRF parameterizations like **BEP**, **BEP+BEM**, and **SLUCM**.
 
-The package integrates urban data such as building fractions, heights, and urban areas from high-resolution sources like **World Settlement Footprint 3D**, **Global Urban Fraction**, and the **UrbanSurfAce Project**. This data improves the representation of urban surfaces, leading to more precise simulations of urban heat islands, microclimates, and energy exchanges.
+The package integrates urban data such as urban fraction, building heights, building surface fraction and others from high-resolution sources like **World Settlement Footprint 3D**, **Global Urban Fraction**, and the **UrbanSurfAce Project**. This data improves the representation of urban surfaces, leading to more precise simulations of urban heat islands, microclimates, and energy exchanges.
 
 ## Features
 
-- **Download** urban morphology data like building heights and urban fractions.
-- **Calculate** the necessary urban fields for WRF, such as **URB_PARAM** and **FRC_URB2D**.
-- **Ingest** these fields directly into WRF's **geo_em** files for improved urban area simulation.
+The package automatically:
+
+- **Downloads** urban morphology data like building heights and urban fractions.
+- **Calculates** the necessary urban fields for WRF: **URB_PARAM** and **FRC_URB2D**.
+- **Ingests** these fields directly into WRF's **geo_em** files.
 
 ## Installation
 

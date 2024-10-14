@@ -77,16 +77,21 @@
              
   <section id="wrfup-wrf-urban-parameters-toolkit">
 <h1>wrfup: WRF Urban Parameters Toolkit<a class="headerlink" href="#wrfup-wrf-urban-parameters-toolkit" title="Link to this heading"></a></h1>
-<p>Welcome to the <strong>wrfup</strong> documentation! This tool enables users to integrate high-resolution, real-world urban data into WRF simulations efficiently. It provides the functionalities to download, calculate, and ingest urban fields directly into WRF geo_em files. Using wrfup, users can enhance urban weather simulations with advanced support for urban parameterizations, including SLUCM, BEP, and BEP+BEM.</p>
+<p>Welcome to the <strong>wrfup</strong> documentation! A python tool to integrate high-resolution, real-world urban data into WRF (Weather Research and Forcast). It automatically downloads, calculates, and ingests the needed urban fields directly into WRF geo_em files. Using wrfup, users can enhance urban weather simulations with any of the WRF’s urban canopy parameterizations, including SLUCM, BEP, and BEP+BEM.</p>
 <a class="reference internal image-reference" href="_images/logo_wrfup.png"><img alt="wrfup logo" class="align-center" src="_images/logo_wrfup.png" style="width: 300px;" /></a>
 <section id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
-<p><strong>wrfup</strong> is a Python tool designed for urban climate modeling. It allows you to:</p>
+<p><strong>wrfup</strong> is a Python tool designed to streamline the data preparation of urban climate simulations. It automatically:</p>
 <ul class="simple">
-<li><p><strong>Download</strong> urban morphology data like building heights and urban fraction.</p></li>
-<li><p><strong>Calculate</strong> the necessary urban fields for WRF, such as <strong>URB_PARAM</strong> and <strong>FRC_URB2D</strong>.</p></li>
-<li><p><strong>Ingest</strong> these fields directly into WRF’s <strong>geo_em</strong> files, ensuring precise representation of urban areas in your simulations.</p></li>
+<li><p><strong>Downloads</strong> urban morphology data like building heights and urban fraction from the state of the art global sources.</p></li>
+<li><p><strong>Calculates</strong> the necessary urban fields for WRF, such as <strong>URB_PARAM</strong> and <strong>FRC_URB2D</strong>.</p></li>
+<li><p><strong>Ingests</strong> these fields directly into WRF’s <strong>geo_em</strong> files, ensuring a fine representation of urban areas in your simulations.</p></li>
 </ul>
+</section>
+<section id="workflow-diagram">
+<h2>Workflow Diagram<a class="headerlink" href="#workflow-diagram" title="Link to this heading"></a></h2>
+<p>The following diagram shows how <strong>wrfup</strong> integrates into the WRF preprocessing workflow:</p>
+<img alt="wrfup workflow" class="align-center" src="_images/workflow_wrfup.png" />
 <div class="toctree-wrapper compound">
 <p class="caption" role="heading"><span class="caption-text">Sections:</span></p>
 <ul>

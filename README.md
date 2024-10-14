@@ -2,7 +2,9 @@
 # wrfup: WRF Urban Parameters Toolkit
 ## A Python Tool for Ingesting Urban Morphology Data into WRF Simulations
 
-<img src="https://raw.githubusercontent.com/jacobogabeiraspenas/wrfup/main/docs/source/_static/logo_wrfup.png" alt="wrfup logo" width="300">
+<p align="center">
+  <img src="https://raw.githubusercontent.com/jacobogabeiraspenas/wrfup/main/docs/source/_static/logo_wrfup.png" alt="wrfup logo" width="300">
+</p>
 
 **wrfup** is a Python package that ingests high-resolution urban morphology data into **WRF** (Weather Research and Forecasting). It automatically **downloads**, **calculates**, and **ingests** urban fields like **FRC_URB2D** (Urban Fraction) and **URB_PARAM** (Urban Parameters) directly into WRF's **geo_em** files. These fields are essential for accurate urban weather simulations and are compatible with WRF parameterizations like **BEP**, **BEP+BEM**, and **SLUCM**.
 

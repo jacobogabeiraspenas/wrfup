@@ -3,7 +3,7 @@ wrfup: WRF Urban Parameters Toolkit
 
 Welcome to the **wrfup** documentation! This tool enables users to integrate high-resolution, real-world urban data into WRF simulations efficiently. It provides the functionalities to download, calculate, and ingest urban fields directly into WRF geo_em files. Using wrfup, users can enhance urban weather simulations with advanced support for urban parameterizations, including SLUCM, BEP, and BEP+BEM.
 
-.. image:: _static/logo.png
+.. image:: _static/logo_wrfup.png
    :alt: wrfup logo
    :align: center
    :width: 300px

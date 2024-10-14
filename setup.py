@@ -19,8 +19,6 @@ setup(
         'pandas',
         'shapely',
         'fiona',
-        'ipyleaflet',
-        'ipywidgets',
         'xarray',
         'scipy',
     ],

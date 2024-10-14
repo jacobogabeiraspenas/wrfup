@@ -1,36 +1,44 @@
+
 # wrfup: WRF Urban Parameters Toolkit
 ## A Python Tool for Ingesting Urban Morphology Data into WRF Simulations
 
-**wrfup** is a Python package designed to help users ingest real-world, high-resolution urban morphology data into WRF (Weather Research and Forecasting) geo_em files. It provides robust functionalities to **download**, **calculate**, and **ingest** crucial urban fields such as **FRC_URB2D** (Urban Fraction) and **URB_PARAM** (Urban Parameters). These fields are essential for accurate urban weather modeling and are compatible with several WRF urban parameterizations, including **BEP (Building Energy Parameterization)**, **BEP+BEM (Building Energy Model)**, and **SLUCM (Single-Layer Urban Canopy Model)**.
+![wrfup logo](https://raw.githubusercontent.com/jacobogabeiraspenas/wrfup/main/docs/source/_static/logo_wrfup.png)
 
-The package allows for the ingestion of data related to urban canopy features, such as building fraction, heights, and urban area coverage, from multiple high-resolution sources (e.g., **World Settlement Footprint 3D**, **Microsoft Buildings**). These detailed datasets significantly improve the representation of urban surfaces in WRF, leading to more precise simulations of urban heat islands, microclimates, and energy exchanges.
+**wrfup** is a Python package that ingests high-resolution urban morphology data into **WRF** (Weather Research and Forecasting). It automatically **downloads**, **calculates**, and **ingests** urban fields like **FRC_URB2D** (Urban Fraction) and **URB_PARAM** (Urban Parameters) directly into WRF's **geo_em** files. These fields are essential for accurate urban weather simulations and are compatible with WRF parameterizations like **BEP**, **BEP+BEM**, and **SLUCM**.
+
+The package integrates urban data such as building fractions, heights, and urban areas from high-resolution sources like **World Settlement Footprint 3D**, **Global Urban Fraction**, and the **UrbanSurfAce Project**. This data improves the representation of urban surfaces, leading to more precise simulations of urban heat islands, microclimates, and energy exchanges.
 
 ## Features
 
-- **Download Urban Data:** Easily download urban fraction and urban parameter tiles for any area of interest.
-- **Calculate Fields:** Compute the necessary fields (e.g., FRC_URB2D, URB_PARAM) for WRF urban simulations.
-- **Ingest Data:** Automatically insert the calculated fields into WRF geo_em files.
-- **Command-line Tool:** Provides a user-friendly CLI to facilitate all operations.
+- **Download** urban morphology data like building heights and urban fractions.
+- **Calculate** the necessary urban fields for WRF, such as **URB_PARAM** and **FRC_URB2D**.
+- **Ingest** these fields directly into WRF's **geo_em** files for improved urban area simulation.
 
 ## Installation
 
-To install the `wrfup` package, simply use `pip`:
+To install the `wrfup` package:
 
 ```bash
 pip install wrfup
 ```
 
-or
+or install from TestPyPI:
 
 ```bash
-pip install -i https://test.pypi.org/simple/ wrfup==1.0.0
+pip install -i https://test.pypi.org/simple/ wrfup
 ```
+
+## Workflow
+
+This diagram shows how **wrfup** integrates into the WRF preprocessing workflow:
+
+![wrfup workflow](https://raw.githubusercontent.com/jacobogabeiraspenas/wrfup/main/docs/source/_static/workflow_wrfup.png)
 
 ## Usage
 
 ### Command-Line Interface (CLI)
 
-You can use `wrfup` as a command-line tool to work with WRF geo_em files:
+You can use `wrfup` to calculate and ingest **URB_PARAM** or **FRC_URB2D** fields into **geo_em** files:
 
 ```bash
 wrfup geo_em.d0X.nc URB_PARAM --work_dir YOUR_DIRECTORY
@@ -42,21 +50,39 @@ or
 wrfup geo_em.d0X.nc FRC_URB2D --work_dir YOUR_DIRECTORY
 ```
 
+## Example Use Case
+
+1. Prepare your `geo_em.d0X.nc` file.
+2. Run the following command to compute the **URB_PARAM** field:
+
+```bash
+wrfup geo_em.d03.nc URB_PARAM --work_dir /path/to/working_directory
+```
+
+3. The updated file will be saved as `geo_em_URB_PARAM.d03.nc`. 
+4. To compute **FRC_URB2D**, run the command:
+
+```bash
+wrfup geo_em_URB_PARAM.d03.nc FRC_URB2D --work_dir /path/to/working_directory
+```
+
+5. Rename the final file for **metgrid**:
+
+```bash
+mv geo_em_URB_PARAM_FRC_URB2D.d03.nc geo_em.d03.nc
+```
+
 ## Modules
 
-`wrfup` includes the following modules:
-
-- **`main`**: The entry point for the command-line interface.
-- **`download`**: Functions to download urban data tiles.
-- **`calculation`**: Functions to compute required fields (e.g., FRC_URB2D, URB_PARAM).
-- **`utils`**: Utility functions like file cleanup and validation.
-- **`info`**: Handles configuration and argument parsing.
-
-For more detailed instructions and documentation, visit: [wrfup Documentation](https://wrfup.readthedocs.io/)
+- **main**: Entry point for the command-line interface.
+- **download**: Download urban data tiles.
+- **calculation**: Compute fields like **URB_PARAM** and **FRC_URB2D**.
+- **utils**: Utilities for cleanup and validation.
+- **info**: Handle configurations and arguments.
 
 ## Development
 
-To set up a development environment for `wrfup`, clone the repository and install the dependencies:
+Clone the repository and install the dependencies:
 
 ```bash
 git clone https://github.com/jacobogabeiraspenas/wrfup.git
@@ -66,11 +92,11 @@ pip install -r requirements.txt
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
 ## Contact
 
-If you have any questions or suggestions, feel free to open an issue or reach out to the author:
+Questions or suggestions? Open an issue or reach out:
 
 **Jacobo Gabeiras Penas**  
 Email: jacobogabeiras@gmail.com

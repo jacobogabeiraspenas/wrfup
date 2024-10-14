@@ -20,7 +20,7 @@ Features
 
 ---
 
-Example Data Sources:
+Data Sources:
 ---------------------
 
 - **World Settlement Footprint 3D**: Provides detailed global building stock data.

@@ -85,20 +85,32 @@
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>wrfup
 </pre></div>
 </div>
-<p>For testing purposes, you can also install from TestPyPI:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-i<span class="w"> </span>https://test.pypi.org/simple/<span class="w"> </span><span class="nv">wrfup</span><span class="o">==</span><span class="m">1</span>.0.0
+<p>You can also install from TestPyPI:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-i<span class="w"> </span>https://test.pypi.org/simple/<span class="w"> </span>wrfup
 </pre></div>
 </div>
-<p>—</p>
 <section id="system-requirements">
 <h2>System Requirements<a class="headerlink" href="#system-requirements" title="Link to this heading"></a></h2>
 <ul class="simple">
-<li><p>Python 3.8 or above.</p></li>
+<li><p>Python 3.0 or above.</p></li>
 <li><p>The package is compatible with major operating systems (Linux, macOS, Windows).</p></li>
 <li><p>Dependencies: The <cite>requirements.txt</cite> includes necessary dependencies such as <cite>xarray</cite>, <cite>scipy</cite>, <cite>netCDF4</cite>, and others.</p></li>
 </ul>
 <p>Make sure to set up your environment before installing the package by running:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>https://raw.githubusercontent.com/jacobogabeiraspenas/wrfup/main/requirements.txt
+</pre></div>
+</div>
+<p>Or you can install the dependencies manually:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">numpy</span><span class="o">==</span><span class="m">1</span>.24.4
+<span class="nv">tqdm</span><span class="o">==</span><span class="m">4</span>.64.0
+<span class="nv">requests</span><span class="o">==</span><span class="m">2</span>.32.2
+<span class="nv">netCDF4</span><span class="o">==</span><span class="m">1</span>.5.7
+<span class="nv">pandas</span><span class="o">==</span><span class="m">2</span>.2.3
+<span class="nv">shapely</span><span class="o">==</span><span class="m">2</span>.0.2
+<span class="nv">fiona</span><span class="o">==</span><span class="m">1</span>.8.22
+<span class="nv">rasterio</span><span class="o">==</span><span class="m">1</span>.3.6
+<span class="nv">xarray</span><span class="o">==</span><span class="m">2024</span>.7.0
+<span class="nv">scipy</span><span class="o">==</span><span class="m">1</span>.9.3
 </pre></div>
 </div>
 </section>

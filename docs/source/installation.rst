@@ -17,7 +17,7 @@ You can also install from TestPyPI:
 
 System Requirements
 --------------------
-- Python 3.8 or above.
+- Python 3.0 or above.
 - The package is compatible with major operating systems (Linux, macOS, Windows).
 - Dependencies: The `requirements.txt` includes necessary dependencies such as `xarray`, `scipy`, `netCDF4`, and others.
   

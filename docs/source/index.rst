@@ -14,7 +14,7 @@ Overview
 
 **wrfup** is a Python tool designed to streamline the urban data preparation of urban climate simulations. It automatically:
 
-- **Downloads** urban morphology data like building heights and urban fraction from the state of the art global sources.
+- **Downloads** urban morphology data like building heights and urban fraction from sources of high resolution global datasets.
 - **Calculates** the necessary urban fields for WRF, such as **URB_PARAM** and **FRC_URB2D**.
 - **Ingests** these fields directly into WRF’s **geo_em** files, ensuring a fine representation of urban areas in your simulations. 
 

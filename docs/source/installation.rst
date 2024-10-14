@@ -7,13 +7,13 @@ To install the latest stable release of **wrfup**, use `pip`:
 
    pip install wrfup
 
-For testing purposes, you can also install from TestPyPI:
+You can also install from TestPyPI:
 
 .. code-block:: bash
 
-   pip install -i https://test.pypi.org/simple/ wrfup==1.0.0
+   pip install -i https://test.pypi.org/simple/ wrfup
 
----
+
 
 System Requirements
 --------------------
@@ -25,5 +25,19 @@ Make sure to set up your environment before installing the package by running:
 
 .. code-block:: bash
 
-   pip install -r requirements.txt
+   pip install -r https://raw.githubusercontent.com/jacobogabeiraspenas/wrfup/main/requirements.txt
 
+Or you can install the dependencies manually:
+
+.. code-block:: bash
+
+   numpy==1.24.4
+   tqdm==4.64.0
+   requests==2.32.2
+   netCDF4==1.5.7
+   pandas==2.2.3
+   shapely==2.0.2
+   fiona==1.8.22
+   rasterio==1.3.6
+   xarray==2024.7.0
+   scipy==1.9.3

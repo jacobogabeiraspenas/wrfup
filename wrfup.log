@@ -629,3 +629,45 @@
 2024-10-28 23:23:47,619 - INFO - Only one tile downloaded. No merging required.
 2024-10-28 23:23:57,809 - INFO - Modified geo_em file saved to 00_test/geo_em.d03_URB_PARAM.nc_alberto
 2024-10-28 23:23:57,810 - INFO - Process completed successfully.
+2024-10-29 11:32:56,198 - ERROR - Work directory not found: 00_test
+2024-10-29 11:33:17,754 - WARNING - Field URB_PARAM is not the correct shape. Expected array with shape (1, 131, nx, ny). Instead got shape (1, 18, 72, 87). This can cause issues.
+2024-10-29 11:33:29,775 - INFO - Rewriting field URB_PARAM...
+2024-10-29 11:33:41,713 - INFO - Only one tile downloaded. No merging required.
+2024-10-29 11:33:51,962 - INFO - Modified geo_em file saved to 00_test/geo_em.d03_URB_PARAM.nc_alberto
+2024-10-29 11:33:51,964 - INFO - Process completed successfully.
+2024-10-29 12:15:01,608 - INFO - Only one tile downloaded. No merging required.
+2024-10-29 12:15:01,704 - WARNING - CPLE_AppDefined in PROJ: internal_proj_create_from_database: /Users/gabeiras3j/opt/anaconda3/envs/repre/share/proj/proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 3 is expected. It comes from another PROJ installation.
+2024-10-29 12:15:02,907 - INFO - Modified geo_em file saved to 00_test/geo_em.d03_FRC_URB2D.nc_alberto
+2024-10-29 12:15:02,907 - INFO - Process completed successfully.
+2024-10-29 12:18:12,856 - INFO - Only one tile downloaded. No merging required.
+2024-10-29 12:18:12,957 - WARNING - CPLE_AppDefined in PROJ: internal_proj_create_from_database: /Users/gabeiras3j/opt/anaconda3/envs/repre/share/proj/proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 3 is expected. It comes from another PROJ installation.
+2024-10-29 12:18:14,270 - INFO - Modified geo_em file saved to 00_test/geo_em.d03_FRC_URB2D.nc_alberto
+2024-10-29 12:18:14,270 - INFO - Process completed successfully.
+2024-10-29 12:59:59,999 - INFO - Only one tile downloaded. No merging required.
+2024-10-29 13:00:01,691 - INFO - Modified geo_em file saved to ../00_test/geo_em.d03_FRC_URB2D.nc_alberto
+2024-10-29 13:00:01,691 - INFO - Process completed successfully.
+2024-10-29 13:04:16,175 - INFO - Only one tile downloaded. No merging required.
+2024-10-29 13:04:16,247 - WARNING - CPLE_AppDefined in PROJ: internal_proj_create_from_database: /Users/gabeiras3j/opt/anaconda3/envs/repre/share/proj/proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 3 is expected. It comes from another PROJ installation.
+2024-10-29 13:04:17,465 - INFO - Modified geo_em file saved to ../00_test/geo_em.d03_FRC_URB2D.nc_alberto
+2024-10-29 13:04:17,465 - INFO - Process completed successfully.
+2024-10-29 14:41:09,394 - WARNING - Missing fields in geo_em file: ['FRC_URB2D']
+2024-10-29 14:41:09,395 - ERROR - An error occurred while checking the geo_em file: "No variable named 'FRC_URB2D'. Variables on the dataset include ['Times', 'XLAT_M', 'XLONG_M', 'XLAT_V', 'XLONG_V', ..., 'OL1', 'OL2', 'OL3', 'OL4', 'VAR_SSO']"
+2024-10-29 14:42:36,102 - WARNING - Missing fields in geo_em file: ['FRC_URB2D']
+2024-10-29 14:42:36,102 - ERROR - An error occurred while checking the geo_em file: "No variable named 'FRC_URB2D'. Variables on the dataset include ['Times', 'XLAT_M', 'XLONG_M', 'XLAT_V', 'XLONG_V', ..., 'OL1', 'OL2', 'OL3', 'OL4', 'VAR_SSO']"
+2024-10-29 14:42:44,133 - WARNING - Exiting process.
+2024-10-29 14:45:29,807 - INFO - All required fields are present in the geo_em file.
+2024-10-29 14:45:39,598 - WARNING - Missing fields in geo_em file: ['FRC_URB2D']
+2024-10-29 14:45:39,598 - ERROR - An error occurred while checking the geo_em file: "No variable named 'FRC_URB2D'. Variables on the dataset include ['Times', 'XLAT_M', 'XLONG_M', 'XLAT_V', 'XLONG_V', ..., 'OL1', 'OL2', 'OL3', 'OL4', 'VAR_SSO']"
+2024-10-29 14:45:54,283 - WARNING - Missing fields in geo_em file: ['FRC_URB2D']
+2024-10-29 14:45:54,284 - ERROR - An error occurred while checking the geo_em file: "No variable named 'FRC_URB2D'. Variables on the dataset include ['Times', 'XLAT_M', 'XLONG_M', 'XLAT_V', 'XLONG_V', ..., 'OL1', 'OL2', 'OL3', 'OL4', 'VAR_SSO']"
+2024-10-29 14:46:05,890 - WARNING - CPLE_AppDefined in PROJ: internal_proj_create_from_database: /Users/gabeiras3j/opt/anaconda3/envs/repre/share/proj/proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 3 is expected. It comes from another PROJ installation.
+2024-10-29 14:48:38,810 - WARNING - Missing fields in geo_em file: ['FRC_URB2D']
+2024-10-29 14:48:38,810 - ERROR - An error occurred while checking the geo_em file: 'FRC_URB2D'
+2024-10-29 14:51:07,263 - WARNING - Missing fields in geo_em file: ['FRC_URB2D']
+2024-10-29 14:51:46,669 - WARNING - Missing fields in geo_em file: ['FRC_URB2D']
+2024-10-29 14:53:09,049 - WARNING - Missing fields in geo_em file: ['FRC_URB2D']
+2024-10-29 14:53:31,250 - INFO - GDAL signalled an error: err_no=4, msg='../tmp/FRC_URB2D/merged_tiles.tif: No such file or directory'
+2024-10-29 14:53:40,618 - WARNING - Missing fields in geo_em file: ['FRC_URB2D']
+2024-10-29 14:53:53,492 - WARNING - CPLE_AppDefined in PROJ: internal_proj_create_from_database: /Users/gabeiras3j/opt/anaconda3/envs/repre/share/proj/proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 3 is expected. It comes from another PROJ installation.
+2024-10-29 14:55:07,792 - WARNING - Missing fields in geo_em file: ['URB_PARAM']
+2024-10-29 14:55:58,714 - WARNING - CPLE_AppDefined in PROJ: internal_proj_create_from_database: /Users/gabeiras3j/opt/anaconda3/envs/repre/share/proj/proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 3 is expected. It comes from another PROJ installation.

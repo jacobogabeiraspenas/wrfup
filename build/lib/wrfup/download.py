@@ -70,21 +70,26 @@ def download_tiles(tile_names, save_dir, download_url):
         confirm = input(f"Total download size is {total_size_in_mb:.2f} MB. Do you want to proceed? (y/n): ").lower()
 
     if confirm != 'y':
-        logging.info("Download canceled by the user.")
-        return
-
+        confirm2 = input(f"Download canceled by the user, would you still like to proceed with the field calculation? (y/n): ").lower()
+        if confirm2 != 'y':
+            logging.warning("Exiting process.")
+            return
+        
+    
     # Use tqdm to display the progress of the download
     for file_num, tile_name in enumerate(tile_names):
         file_name = f"{tile_name}.zip"
         zip_file_url = f"{download_url}/{file_name}"
-        download_and_extract_zip(zip_file_url, save_dir, file_num + 1, len(tile_names))
+        if confirm == 'y':
+            download_and_extract_zip(zip_file_url, save_dir, file_num + 1, len(tile_names))
         tile_paths.append(os.path.join(save_dir, f"{tile_name}.tif"))
 
 
     # If multiple tiles were downloaded, merge them
     if len(tile_paths) > 1:
         output_path = os.path.join(save_dir, "merged_tiles.tif")
-        merge_tiles(tile_paths, output_path)
+        if confirm == 'y':
+            merge_tiles(tile_paths, output_path)
     else:
         logging.info("Only one tile downloaded. No merging required.")
         output_path = tile_paths[0]
@@ -115,7 +120,7 @@ def lat_lon_to_tile_indices(lat, lon, grid_rows=16, grid_cols=16):
     return min(max(row_index, 0), grid_rows - 1), min(max(col_index, 0), grid_cols - 1)
 
 
-def get_tile_names_in_aoi(lat_min, lat_max, lon_min, lon_max, field):
+def get_tile_names_in_aoi_deprecated(lat_min, lat_max, lon_min, lon_max, field):
     """
     Get the list of tile names for the area of interest (AOI) based on latitude and longitude,
     with different naming conventions for FRC_URB2D and URB_PARAM fields.
@@ -146,6 +151,43 @@ def get_tile_names_in_aoi(lat_min, lat_max, lon_min, lon_max, field):
             tile_names.add(tile_name)
 
     return list(tile_names)
+
+def get_tile_names_in_aoi(lat_min, lat_max, lon_min, lon_max, field):
+    """
+    Get the list of tile names for the area of interest (AOI) based on latitude and longitude,
+    with different naming conventions for FRC_URB2D and URB_PARAM fields.
+
+    Args:
+        lat_min (float): Minimum latitude of AOI.
+        lat_max (float): Maximum latitude of AOI.
+        lon_min (float): Minimum longitude of AOI.
+        lon_max (float): Maximum longitude of AOI.
+        field (str): The field type ('FRC_URB2D' or 'URB_PARAM').
+
+    Returns:
+        list: List of tile names covering the entire AOI.
+    """
+    tile_names = set()
+
+    # Calculate tile indices for each corner
+    min_row_idx, min_col_idx = lat_lon_to_tile_indices(lat_max, lon_min)
+    max_row_idx, max_col_idx = lat_lon_to_tile_indices(lat_min, lon_max)
+
+    # Generate all tile names within the AOI range
+    for row_idx in range(min_row_idx, max_row_idx + 1):
+        for col_idx in range(min_col_idx, max_col_idx + 1):
+            # Set naming convention based on the field type
+            if field == 'FRC_URB2D':
+                tile_name = f"{row_idx:02d}_{col_idx:02d}_zoom4_urban_fraction_100m_int8"
+            elif field == 'URB_PARAM':
+                tile_name = f"{row_idx:02d}_{col_idx:02d}_zoom4_URB_PARAM_100m"
+            else:
+                raise ValueError(f"Unknown field type: {field}")
+            
+            tile_names.add(tile_name)
+
+    return list(tile_names)
+
 
 
 

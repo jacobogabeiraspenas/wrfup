@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='wrfup',  # The name of your package
-    version='1.0.2',  # Package version
+    version='1.0.7',  # Package version
     description='A Python package for ingesting urban data into WRF geo_em files.',
     long_description=open('README.md').read(),  # Include README as long description
     long_description_content_type='text/markdown',

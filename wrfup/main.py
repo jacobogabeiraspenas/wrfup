@@ -35,8 +35,8 @@ def main(argv=None):
                         help="Field to ingest into the geo_em file.")
     
     # Optional arguments
-    parser.add_argument('--work_dir', type=str, default='./workdir', 
-                        help="Working directory where geo_em files and output will be stored (default: ./workdir).")
+    parser.add_argument('--work_dir', type=str, default='./', 
+                        help="Working directory where geo_em files and output will be stored (default: ./).")
     parser.add_argument('--temp_dir', type=str, default='./temp', 
                         help="Directory for temporary files (default: ./temp).")
 

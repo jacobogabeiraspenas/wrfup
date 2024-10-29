@@ -4,6 +4,34 @@ import shutil
 import logging
 import xarray as xr
 
+def first_checks(info):
+    """
+    Perform the first checks before processing the geo_em file. 
+    This includes checking if the geo_em file exists, the work directory exists, and the field is valid.
+
+    Args:
+        info (Info): An Info object containing the paths and configuration.
+    
+    Returns:
+        int: 1 if there is an error
+    """
+    # Check if the work directory and geo_em file exist
+    path_to_geo_em = os.path.join(info.work_dir, info.geo_em_file)
+
+    if not os.path.exists(info.work_dir):
+        logging.error(f"Work directory not found: {info.work_dir}")
+        return 1
+
+    if not os.path.exists(path_to_geo_em):
+        logging.error(f"geo_em file not found: {info.geo_em_file}")
+        return 1
+
+    if info.field not in ['FRC_URB2D', 'URB_PARAM']:
+        logging.error(f"Invalid field: {info.field}. Please choose from FRC_URB2D or URB_PARAM.")
+        return 1
+    
+    return 0
+
 def check_geo_em_file(geo_em_file, field):
     """
     Check the geo_em file for the required fields before processing.
@@ -20,23 +48,32 @@ def check_geo_em_file(geo_em_file, field):
         # Open the geo_em file using xarray
         ds = xr.open_dataset(geo_em_file)
 
-        # Common fields to check
+        # Fields to check
         required_fields = ['XLAT_M', 'XLONG_M', 'XLAT_C', 'XLONG_C']
 
         # Add specific fields based on user selection
-        if field == 'FRC_URB2D':
-            required_fields.append('FRC_URB2D')
-        elif field == 'URB_PARAM':
-            required_fields.append('URB_PARAM')
+        required_fields.append(field)
 
         # Check if all required fields are present
         missing_fields = [f for f in required_fields if f not in ds.data_vars]
         if missing_fields:
             logging.warning(f"Missing fields in geo_em file: {missing_fields}")
-            ds.close()
-            return None
+        else:
+            logging.info("All required fields are present in the geo_em file.")
 
-        logging.info("All required fields are present in the geo_em file.")
+        # Check if field is the correct shape
+        if field == 'FRC_URB2D':
+            if len(ds[field].shape) != 3:
+                logging.warning(f"Field {field} is not the correct shape. Expected 2D array.")
+        elif field == 'URB_PARAM':
+            if ds[field].shape[1] != 131:
+                logging.warning(f"Field {field} is not the correct shape. Expected array with shape (1, 131, nx, ny). Instead got shape {ds[field].shape}. This can cause issues.")
+                rewrite_confirm = input(f"Would you like to rewrite this field? (y/n): ").lower()
+                if rewrite_confirm == 'y':
+                    logging.info(f"Rewriting field {field}...")
+                    # Rewrite the field
+                    ds = ds.drop_vars(field)
+
         return ds
 
     except FileNotFoundError:
@@ -44,8 +81,8 @@ def check_geo_em_file(geo_em_file, field):
         return None
 
     except Exception as e:
-        logging.error(f"An error occurred while checking the geo_em file: {e}")
-        return None
+        #logging.warning(f"A warning occurred while checking the geo_em file: {e}")
+        return ds
     
 def get_lat_lon_extent(geo_em_file):
     """

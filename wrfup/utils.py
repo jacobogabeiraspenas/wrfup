@@ -59,8 +59,7 @@ def check_geo_em_file(geo_em_file, field):
         if missing_fields:
             logging.warning(f"Missing fields in geo_em file: {missing_fields}")
         else:
-            pass
-            #logging.info("All required fields are present in the geo_em file.")
+            logging.info("All required fields are present in the geo_em file.")
 
         # Check if field is the correct shape
         if field == 'FRC_URB2D':
@@ -74,8 +73,6 @@ def check_geo_em_file(geo_em_file, field):
                     logging.info(f"Rewriting field {field}...")
                     # Rewrite the field
                     ds = ds.drop_vars(field)
-                else:
-                    pass
 
         return ds
 
@@ -84,8 +81,8 @@ def check_geo_em_file(geo_em_file, field):
         return None
 
     except Exception as e:
-        logging.error(f"An error occurred while checking the geo_em file: {e}")
-        return None
+        #logging.warning(f"A warning occurred while checking the geo_em file: {e}")
+        return ds
     
 def get_lat_lon_extent(geo_em_file):
     """

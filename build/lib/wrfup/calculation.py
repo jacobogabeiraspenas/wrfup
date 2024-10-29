@@ -46,57 +46,16 @@ def calculate_urb_param(info, geo_em_ds, merged_tiff_path, field_name='URB_PARAM
     
     The building height distribution is computed using the following bin ranges (in meters):
     - 0-5, 5-10, 10-15, ..., up to 70+ meters.
+
+    Args:
+        info (Info): The configuration object containing paths and settings.
+        geo_em_ds (xarray.Dataset): The opened geo_em dataset.
+        merged_tiff_path (str): Path to the merged GeoTIFF file containing LAMBDA_B, LAMBDA_P, and Building Heights.
+        field_name (str): The field name to store the data (default: 'URB_PARAM').
+
+    Returns:
+        xarray.Dataset: Updated geo_em dataset with calculated URB_PARAM fields.
     """
-
-
-# def calculate_urb_param(info, geo_em_ds, merged_tiff_path, field_name='URB_PARAM'):
-#     """
-#     Calculate the URB_PARAM field by averaging LAMBDA_B, LAMBDA_P, weighted Building Heights,
-#     geometric mean of building heights, standard deviation of building heights, 
-#     Frontal Area Index (FAI) for four directions (N, S, E, W), 
-#     and computing the building height distribution in 5-meter intervals.
-
-#     This calculation follows the **NUDAPT 44** (National Urban Database and Access Portal Tool) 
-#     field structure, ensuring compatibility with the urban parameterization in WRF. 
-#     Fields are stored in specific indices of the `URB_PARAM` array:
-
-#     - **LAMBDA_P (Plan Area Fraction)**: 
-#     Stored in slice [90,:,:] of `URB_PARAM`. It represents the fraction of the grid cell's area covered by building footprints.
-
-#     - **Mean Building Height (Geometric Mean)**:
-#     Stored in slice [91,:,:] of `URB_PARAM`. It is the geometric mean of building heights within the grid cell.
-
-#     - **Standard Deviation of Building Heights**:
-#     Stored in slice [92,:,:] of `URB_PARAM`. It calculates the standard deviation of building heights.
-
-#     - **Weighted Building Height**:
-#     Stored in slice [93,:,:] of `URB_PARAM`. It represents the average building height weighted by the planar surface area (LAMBDA_P).
-
-#     - **LAMBDA_B (Frontal Area Fraction)**:
-#     Stored in slice [94,:,:] of `URB_PARAM`. It represents the fraction of the grid cell's frontal area occupied by building walls.
-
-#     - **Frontal Area Index (FAI)** for the four cardinal directions:
-#     - **North**: Stored in slice [96,:,:] of `URB_PARAM`.
-#     - **South**: Stored in slice [97,:,:] of `URB_PARAM`.
-#     - **East**: Stored in slice [98,:,:] of `URB_PARAM`.
-#     - **West**: Stored in slice [99,:,:] of `URB_PARAM`.
-
-#     - **Building Height Distribution**:
-#     Stored in slices [117:132,:,:] of `URB_PARAM`. Each slice represents the percentage of buildings within the grid cell 
-#     that fall within specific height bins (5-meter intervals).
-
-#     The building height distribution is computed using the following bin ranges (in meters):
-#     - 0-5, 5-10, 10-15, ..., up to 70+ meters.
-
-#     Args:
-#         info (Info): The configuration object containing paths and settings.
-#         geo_em_ds (xarray.Dataset): The opened geo_em dataset.
-#         merged_tiff_path (str): Path to the merged GeoTIFF file containing LAMBDA_B, LAMBDA_P, and Building Heights.
-#         field_name (str): The field name to store the data (default: 'URB_PARAM').
-
-#     Returns:
-#         xarray.Dataset: Updated geo_em dataset with calculated URB_PARAM fields.
-#     """
 
 
     # Ensure URB_PARAM fields exist in geo_em and are initialized

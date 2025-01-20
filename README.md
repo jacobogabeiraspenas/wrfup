@@ -1,5 +1,5 @@
 
-# wrfup: WRF Urban Parameters Toolkit
+# wrfup: WRF Urban Parameters
 ## A Python Tool for Ingesting Urban Morphology Data into WRF Simulations
 
 <p align="center">

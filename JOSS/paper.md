@@ -10,13 +10,16 @@ tags:
 authors:
   - name: Jacobo Gabeiras^[corresponding author]
     affiliation: 1
-    orcid: 0000-0000-0000-0000
+    orcid: 0009-0003-5959-2012
   - name: Chantal Staquet
     affiliation: 1
+    orcid: 0000-0002-2344-4507
   - name: Charles Chemel
     affiliation: 2
+    orcid: 0000-0002-6935-7177
   - name: Alberto Martilli
     affiliation: 3
+    orcid: 0000-0002-7795-5871
 affiliations:
   - name: Université Grenoble Alpes, CNRS, Grenoble INP, LEGI, France
     index: 1
@@ -24,7 +27,7 @@ affiliations:
     index: 2
   - name: Centro de Investigaciones Energéticas, Medioambientales y Tecnológicas, CIEMAT, Spain
     index: 3
-date: 2025-XX-XX
+date: 2025-12-12
 bibliography: paper.bib
 ---
 
@@ -97,7 +100,7 @@ The tool updates the geo_em file, calculating the urban canopy parameters and ge
 
 The WRFUP tool is designed to work seamlessly with the Weather Research and Forecasting (WRF) Preprocessing System (WPS). The workflow integrates WRFUP with WRF’s Preprocessing System as shown in Figure 1.
 
-![Integration of WRFUP package within the WRF Preprocessing System workflow. The WRFUP Python package generates a new geo_em file. This file is represented in the figure as geo_em_new.d0X.nc which will typically take the name of geo_em_URB_PARAM.d0X.nc or geo_em_FRC_URB2D.d0X.nc. This file needs to be renamed as the original file to continue the WPS workflow.](figure1.png)
+![Integration of WRFUP package within the WRF Preprocessing System workflow. The WRFUP Python package generates a new geo_em file. This file is represented in the figure as geo_em_new.d0X.nc which will typically take the name of geo_em_URB_PARAM.d0X.nc or geo_em_FRC_URB2D.d0X.nc. This file needs to be renamed as the original file to continue the WPS workflow.](pics/workflow_wrfup.png)
 
 # Important Notes
 
@@ -109,7 +112,7 @@ The WRFUP tool is designed to work seamlessly with the Weather Research and Fore
 
 • Inspecting Updated URB_PARAM Fields: It is recommended to visually check the correctness of the updated URB_PARAM fields by using visualization tools like xarray or ncview.
 
-• Further Technical Details: For a full breakdown of installation steps, internal structure, and advanced usage scenarios, please refer to the full documentation in Appendix ??.
+• Further Technical Details: For a full breakdown of installation steps, internal structure, and advanced usage scenarios, please refer to the full documentation (https://wrfup.readthedocs.io/en/latest/) and the GitHub repository (https://github.com/jacobogabeiraspenas/wrfup).
 
 # References
 

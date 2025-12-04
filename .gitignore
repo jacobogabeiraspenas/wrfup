@@ -1,8 +1,18 @@
+# Python cache
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
+
+# Build artifacts
 build/
 dist/
 *.egg-info/
+
+# Logs
+*.log
+
+# IDEs (optional but recommended)
+.vscode/
+.idea/
 

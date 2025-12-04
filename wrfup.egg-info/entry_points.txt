@@ -1,2 +1,0 @@
-[console_scripts]
-wrfup = wrfup.main:main

@@ -1,9 +1,0 @@
-numpy
-tqdm
-requests
-netCDF4
-pandas
-shapely
-fiona
-xarray
-scipy
